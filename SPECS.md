@@ -98,7 +98,7 @@ Table {
 
 ### Epic 1 — Project Setup
 
-#### T1.1 — Initialize Next.js project with Tailwind, shadcn/ui, and Prisma
+#### T1.1 — Initialize Next.js project with Tailwind, shadcn/ui, and Prisma ✅
 **Description:** Scaffold the project with all base dependencies.
 **Acceptance criteria:**
 - Next.js App Router project created with TypeScript
@@ -108,6 +108,48 @@ Table {
 - `prisma db push` creates the database
 - Basic folder structure in place (`/app`, `/components`, `/lib`, `/prisma`)
 - Project runs with `npm run dev`
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
+
+**Implementation details:**
+
+All scaffolding runs inside Docker. Config files are written on the host; heavy lifting (npm install, prisma generate, shadcn add) is baked into the Dockerfile.
+
+**Dev environment:**
+- `docker compose up --build` — builds image and starts dev server on http://localhost:3000
+- `docker compose exec app npx prisma db push` — initializes the SQLite database
+- Day-to-day: `docker compose up` (hot reload via bind mount + WATCHPACK_POLLING)
+- Adding new npm packages: update `package.json` + Dockerfile, then `docker compose up --build`
+- Adding new shadcn/ui components: `docker compose exec app npx shadcn@latest add <component>` — writes into `components/ui/` via bind mount, then commit the file
+
+**Key files created:**
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Node 22 Alpine, npm install, prisma generate, shadcn add baked in |
+| `docker-compose.yml` | Bind mount `.:/app`, named `node_modules` volume, port 3000 |
+| `.dockerignore` | Excludes node_modules, .next, dev.db |
+| `package.json` | Next.js 15, React 19, Tailwind v4, Prisma, shadcn deps |
+| `tsconfig.json` | App Router defaults, `@/*` path alias |
+| `next.config.ts` | Minimal config |
+| `postcss.config.mjs` | @tailwindcss/postcss plugin |
+| `components.json` | shadcn/ui config (new-york style, rsc, aliases) |
+| `app/layout.tsx` | Root layout with globals.css import |
+| `app/page.tsx` | Smoke test page with shadcn Card + Button |
+| `app/globals.css` | Tailwind v4 directives + shadcn CSS variables (oklch) |
+| `lib/utils.ts` | `cn()` utility (clsx + tailwind-merge) |
+| `lib/prisma.ts` | Singleton PrismaClient for dev hot-reload |
+| `prisma/schema.prisma` | 4 models: Invitation, Attendee, Admin, Table |
+| `components/ui/button.tsx` | shadcn Button component |
+| `components/ui/card.tsx` | shadcn Card component |
+| `components/ui/input.tsx` | shadcn Input component |
+| `.env` | DATABASE_URL for SQLite |
+| `.gitignore` | node_modules, .next, .env, dev.db |
+
+**Design decisions:**
+- Named `node_modules` volume prevents macOS/Linux binary conflicts
+- shadcn components generated in Dockerfile, copied back to host after first build
+- `prisma db push` as runtime step (DB file lives on host via bind mount)
+- No `create-next-app` — config files written directly for Docker compatibility
 
 #### T1.2 — Set up i18n with next-intl
 **Description:** Configure bilingual support (FR/EN).
@@ -117,6 +159,8 @@ Table {
 - Translation files created (`messages/fr.json`, `messages/en.json`) with placeholder keys
 - Language switcher component (FR/EN toggle) in a shared layout
 - Middleware redirects `/` to `/fr`
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T1.3 — Base layout and navigation
 **Description:** Create the shared layout (header, footer, nav) used across all public pages.
@@ -126,6 +170,8 @@ Table {
 - Mobile hamburger menu
 - Tailwind-based, clean design
 - Placeholder pages exist for all public routes
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 ---
 
@@ -140,6 +186,8 @@ Table {
 - Call-to-action button for guests ("Access your space" → login)
 - At least one fun CSS animation (parallax, fade-in on scroll, or similar)
 - Fully responsive
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T2.2 — Schedule / timeline page
 **Description:** Visual timeline of the wedding day.
@@ -149,6 +197,8 @@ Table {
 - Events data stored in translation files (bilingual)
 - Responsive (works well on mobile)
 - Placeholder data for: ceremony, cocktail hour, dinner, party
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T2.3 — Practical info page
 **Description:** All logistics guests need.
@@ -159,6 +209,8 @@ Table {
 - Dress code section
 - Contact section (email or phone for questions)
 - All text bilingual
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T2.4 — Photo gallery
 **Description:** A grid of couple photos.
@@ -167,6 +219,8 @@ Table {
 - Lightbox on click (full-screen view with navigation)
 - Placeholder images for now
 - Lazy loading for performance
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 ---
 
@@ -181,6 +235,8 @@ Table {
 - Redirects to the private welcome page (`/fr/dashboard` or `/en/dashboard`)
 - If invalid: shows an error page ("Invalid or expired link")
 - Session duration: 30 days
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T3.2 — Auth middleware for private routes
 **Description:** Protect all private pages behind authentication.
@@ -189,6 +245,8 @@ Table {
 - If no valid session: redirect to public landing page
 - Session validation checks expiry
 - Logout endpoint clears the cookie
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T3.3 — QR code generation utility
 **Description:** Utility to generate QR codes from guest tokens.
@@ -197,6 +255,8 @@ Table {
 - Can be called from admin panel or as a script
 - QR code encodes: `https://<base_url>/login?token=<token>`
 - Uses a library like `qrcode` (npm)
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 ---
 
@@ -210,6 +270,8 @@ Table {
 - List of attendees in the invitation with their status
 - Quick links to RSVP form and seating map
 - Displayed in guest's preferred language
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T4.2 — RSVP form
 **Description:** Form for guests to confirm attendance and provide details per attendee.
@@ -231,6 +293,8 @@ Table {
 - Pre-fills with existing data if already submitted
 - Editable (guest can change their answer)
 - Bilingual labels and validation messages
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T4.3 — Seating map page
 **Description:** Visual map showing table assignments.
@@ -242,6 +306,8 @@ Table {
 - If no table assigned yet: "Table assignments coming soon" message
 - Scrollable and zoomable on mobile
 - Table data loaded from DB (or hardcoded JSON as initial step)
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 ---
 
@@ -256,6 +322,8 @@ Table {
 - Sets admin session cookie
 - Redirects to admin dashboard
 - Seed script to create initial admin account
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T5.2 — Guest list dashboard
 **Description:** Overview of all invitations and their RSVP status.
@@ -265,6 +333,8 @@ Table {
 - Filters: by status (pending/confirmed/declined), by table assignment
 - Search by name or group label
 - Export to CSV button
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T5.3 — Guest detail & manual override
 **Description:** View and edit individual invitation records.
@@ -278,6 +348,8 @@ Table {
   - Add/remove/edit attendees
   - Manually override RSVP status and attendee details
 - Save button updates the DB
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T5.4 — QR code bulk export
 **Description:** Generate and download QR codes for all invitations.
@@ -286,6 +358,8 @@ Table {
 - Generates a PDF with one QR code per invitation (group label + QR code)
 - Also supports individual QR download from guest detail page
 - Uses the utility from T3.3
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 ---
 
@@ -298,6 +372,8 @@ Table {
 - Create table: number, label, capacity, position (x, y)
 - Edit and delete existing tables
 - Validation: table number must be unique
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T6.2 — Drag-and-drop table assignment
 **Description:** Visual interface to assign invitations to tables.
@@ -308,6 +384,8 @@ Table {
 - Table shows current occupancy vs capacity
 - Warning when table exceeds capacity
 - Changes saved to DB on drop
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
 
 ---
 

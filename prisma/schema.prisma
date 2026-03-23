@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Invitation {
+  id              String     @id @default(cuid())
+  token           String     @unique
+  groupLabel      String
+  email           String?
+  language        String     @default("fr")
+  allowPlusOne    Boolean    @default(false)
+  rsvpStatus      String     @default("pending")
+  tableNumber     Int?
+  lastLoginAt     DateTime?
+  rsvpSubmittedAt DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  attendees       Attendee[]
+}
+
+model Attendee {
+  id                  String     @id @default(cuid())
+  invitationId        String
+  invitation          Invitation @relation(fields: [invitationId], references: [id])
+  name                String
+  isPrimary           Boolean    @default(false)
+  isPlusOne           Boolean    @default(false)
+  attending           Boolean?
+  dietaryRestrictions String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
+
+model Admin {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+}
+
+model Table {
+  id        String  @id @default(cuid())
+  number    Int     @unique
+  label     String?
+  positionX Float
+  positionY Float
+  capacity  Int
+}
