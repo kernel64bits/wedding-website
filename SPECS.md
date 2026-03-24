@@ -496,6 +496,20 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
+#### T5.5 — QR code image generation
+**Description:** Add QR code image rendering on top of the `buildLoginUrl` utility from T2.4. Kept separate because it requires a new npm package and is purely an end-user facing feature.
+**Acceptance criteria:**
+- Add `qrcode` npm package + `@types/qrcode` to `package.json`
+- Extend `lib/qrcode.ts` with:
+  - `generateQrSvg(token)` → SVG string (used inline on guest detail page T5.3)
+  - `generateQrPng(token)` → PNG Buffer (used in PDF export T5.4)
+- Individual QR preview on `/admin/guests/[id]` renders the real QR image (replaces placeholder from T5.3)
+- "Export all QR codes" PDF on `/admin/guests` generates real QR images (replaces placeholder from T5.4)
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
+
 ---
 
 ### Epic 7 — Production Readiness
@@ -628,15 +642,14 @@ T1.1 ──► T1.2 ──► T1.3 ──► T1.4
                             T2.3           T5.2 ──► T5.3
                               │               │
                     ┌─────────┤            T5.4 (needs T2.4)
-                    ▼         ▼
                   T2.4      T3.1
-                              │
-                            T4.1
-                              │
-              ┌───────────────┼──────────────┐
-              ▼               ▼              ▼
-            T4.2            T4.3           T4.4 ──► T6.1 ──► T6.2
-            T4.5
+                    │         │
+                  T5.5      T4.1
+                    │         │
+              ┌─────┘ ┌───────┼──────────────┐
+              ▼       ▼       ▼              ▼
+            T5.3    T4.2    T4.3           T4.4 ──► T6.1 ──► T6.2
+            T5.4    T4.5
                               │
                 (all of the above)
                               │
