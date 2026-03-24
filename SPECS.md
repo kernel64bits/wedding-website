@@ -2,10 +2,12 @@
 
 ## Context
 
-A bilingual (FR/EN) wedding website with two sections:
-- **Public**: landing page, schedule, practical info, photo gallery — accessible to anyone.
-- **Private**: RSVP form, seating map, personalized welcome — accessible to authenticated guests via QR code.
-- **Admin panel**: dashboard to manage guests, view RSVPs, assign tables, generate QR codes.
+A bilingual (FR/EN) wedding website. Everything is private — unauthenticated users see only a gate page asking them to scan their QR code.
+
+- **Gate**: single public page — "scan your QR code" message + form to receive the link by email or SMS.
+- **Invitation experience**: cinematic, scroll-driven first-login experience (immersive, full-viewport, no navbar).
+- **Guest dashboard**: traditional layout with navbar — RSVP, practical info, seating map, gallery. Guests can replay the invitation from here.
+- **Admin panel**: separate section of the same app (outside locale routes), password-protected, for the couple to manage guests, RSVPs, tables and QR codes.
 
 ### Tech Stack
 
@@ -17,43 +19,78 @@ A bilingual (FR/EN) wedding website with two sections:
 | Database    | Prisma + SQLite         | Zero-config dev, swap to PostgreSQL for prod      |
 | i18n        | next-intl               | Lightweight, supports URL prefix (`/fr`, `/en`)  |
 | Auth        | Custom QR token + cookie| No password for guests, simple and secure        |
-| Admin auth  | Email + password (bcrypt + JWT or session) | Simple, just for the couple |
+| Admin auth  | Email + password (bcrypt + session cookie) | Simple, just for the couple |
 
 ### Design Principles
 
 - **Simplicity over cleverness**: minimal custom code, lean on shadcn/ui components and Tailwind utilities.
 - **Maintainability**: flat file structure, small components, no premature abstractions.
 - **Ready-made first**: use shadcn/ui components (Button, Card, Table, Form, Dialog, Input, Select, Checkbox, Badge, Tabs, etc.) instead of building from scratch. Only create custom components when no shadcn/ui component fits.
+- **Style coherence**: design tokens defined once in T1.3 (palette, fonts, spacing) — all subsequent tickets consume them, never redefine them.
+
+### Route Architecture
+
+```
+app/
+├── [locale]/
+│   ├── (gate)/
+│   │   └── page.tsx              ← public: "scan your QR code" + request link by email/SMS
+│   ├── (immersive)/
+│   │   └── invitation/
+│   │       └── page.tsx          ← cinematic first-login experience (auth required)
+│   └── (dashboard)/
+│       ├── layout.tsx            ← shared navbar + footer (auth required)
+│       ├── home/page.tsx         ← hub: greeting, RSVP status, quick links
+│       ├── rsvp/page.tsx
+│       ├── info/page.tsx         ← schedule, venue, dress code, accommodation
+│       ├── seating/page.tsx
+│       └── gallery/page.tsx
+└── admin/                        ← outside locale (no i18n needed)
+    ├── layout.tsx                ← admin shell (admin auth required)
+    ├── login/page.tsx
+    ├── guests/
+    │   ├── page.tsx              ← guest list + summary stats
+    │   └── [id]/page.tsx         ← guest detail + manual override
+    └── tables/page.tsx           ← table management
+```
+
+**Route groups** (`(gate)`, `(immersive)`, `(dashboard)`) are Next.js organizational folders — they don't appear in URLs. Each has its own layout (or none), so the cinematic invitation page and the dashboard never share a navbar.
 
 ### Authentication Flow
 
 **Guests:**
 1. Each invitation (guest/household) gets a unique token stored in DB.
 2. A QR code encodes: `https://yoursite.com/login?token=<token>`
-3. Visiting the URL validates the token, sets a secure HTTP-only cookie (30-day session).
-4. QR codes printed on invitations or sent via message/email.
+3. `GET /api/login?token=<token>` validates the token, sets a secure HTTP-only cookie (30-day session containing invitation ID + expiry).
+4. **First visit** (`invitationViewedAt` is null): redirect to `/{locale}/invitation`. Set `invitationViewedAt` timestamp.
+5. **Returning visits** (`invitationViewedAt` is set): redirect to `/{locale}/home`.
+6. Any protected route without a valid session cookie → redirect to `/{locale}` (gate page).
+7. Guests can replay the invitation at any time from the dashboard.
 
 **Admin:**
-- Email + password login.
-- Protected by Next.js middleware.
+- Email + password login at `/admin/login`.
+- Sets a separate admin session cookie (independent from guest cookie).
+- Protected by Next.js middleware on `/admin/*` routes (except `/admin/login`).
 
 ### Data Model
 
 ```
 Invitation {
-  id              String    @id @default(cuid())
-  token           String    @unique
-  groupLabel      String                        // e.g. "Famille Dupont"
-  email           String?
-  language        String    @default("fr")      // "fr" | "en"
-  allowPlusOne    Boolean   @default(false)     // admin controls who can bring a +1
-  rsvpStatus      String    @default("pending") // pending | confirmed | declined
-  tableNumber     Int?
-  lastLoginAt     DateTime?
-  rsvpSubmittedAt DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  attendees       Attendee[]
+  id                  String    @id @default(cuid())
+  token               String    @unique
+  groupLabel          String                        // e.g. "Famille Dupont"
+  email               String?
+  phone               String?                       // for SMS link delivery
+  language            String    @default("fr")      // "fr" | "en"
+  allowPlusOne        Boolean   @default(false)
+  rsvpStatus          String    @default("pending") // pending | confirmed | declined
+  tableNumber         Int?
+  invitationViewedAt  DateTime?                     // null = first login not yet done
+  lastLoginAt         DateTime?
+  rsvpSubmittedAt     DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  attendees           Attendee[]
 }
 
 Attendee {
@@ -61,9 +98,9 @@ Attendee {
   invitationId        String
   invitation          Invitation @relation(fields: [invitationId], references: [id])
   name                String
-  isPrimary           Boolean   @default(false)  // the main contact
-  isPlusOne           Boolean   @default(false)  // added by guest via RSVP
-  attending           Boolean?                   // null = not yet answered
+  isPrimary           Boolean   @default(false)
+  isPlusOne           Boolean   @default(false)
+  attending           Boolean?
   dietaryRestrictions String?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
@@ -78,8 +115,8 @@ Admin {
 Table {
   id            String   @id @default(cuid())
   number        Int      @unique
-  label         String?                         // e.g. "Table des mariés"
-  positionX     Float                           // for seating map rendering
+  label         String?
+  positionX     Float
   positionY     Float
   capacity      Int
 }
@@ -87,10 +124,10 @@ Table {
 
 **Key relationships:**
 - An `Invitation` has many `Attendees` (1-to-many).
-- Named attendees (e.g. "Marie" and "Pierre") are pre-created by the admin with `isPrimary = true` for the main contact.
-- If `allowPlusOne = true`, the guest can add one additional `Attendee` with `isPlusOne = true` via the RSVP form.
-- Headcount = count of attendees where `attending = true` for a given invitation.
-- Table assignment is per invitation (the whole group sits together).
+- Named attendees are pre-created by the admin with `isPrimary = true` for the main contact.
+- If `allowPlusOne = true`, the guest can add one `Attendee` with `isPlusOne = true` via the RSVP form.
+- Headcount = count of attendees where `attending = true`.
+- Table assignment is per invitation (whole group sits together).
 
 ---
 
@@ -115,7 +152,7 @@ Table {
 
 **Implementation details:**
 
-All scaffolding runs inside Docker. Config files are written on the host; heavy lifting (npm install, prisma generate, shadcn add) is baked into the Dockerfile.
+All scaffolding runs inside Docker. Config files are written on the host; heavy lifting (npm install, prisma generate) is baked into the Dockerfile.
 
 **Dev environment:**
 - `docker compose up --build` — builds image and starts dev server on http://localhost:3000
@@ -127,7 +164,7 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 **Key files created:**
 | File | Purpose |
 |------|---------|
-| `Dockerfile` | Node 22 Alpine, npm install, prisma generate, shadcn add baked in |
+| `Dockerfile` | Node 22 Alpine, npm install, prisma generate baked in |
 | `docker-compose.yml` | Bind mount `.:/app`, named `node_modules` volume, port 3000 |
 | `.dockerignore` | Excludes node_modules, .next, dev.db |
 | `package.json` | Next.js 15, React 19, Tailwind v4, Prisma, shadcn deps |
@@ -136,7 +173,6 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 | `postcss.config.mjs` | @tailwindcss/postcss plugin |
 | `components.json` | shadcn/ui config (new-york style, rsc, aliases) |
 | `app/layout.tsx` | Root layout with globals.css import |
-| `app/page.tsx` | Smoke test page with shadcn Card + Button |
 | `app/globals.css` | Tailwind v4 directives + shadcn CSS variables (oklch) |
 | `lib/utils.ts` | `cn()` utility (clsx + tailwind-merge) |
 | `lib/prisma.ts` | Singleton PrismaClient for dev hot-reload |
@@ -149,7 +185,6 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 
 **Design decisions:**
 - Named `node_modules` volume prevents macOS/Linux binary conflicts
-- shadcn components generated in Dockerfile, copied back to host after first build
 - `prisma db push` as runtime step (DB file lives on host via bind mount)
 - No `create-next-app` — config files written directly for Docker compatibility
 
@@ -166,14 +201,30 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [x] Post-ticket check: refactor opportunities identified and addressed
 - [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T1.3 — Base layout and navigation
-**Description:** Create the shared layout (header, footer, nav) used across all public pages.
+#### T1.3 — Design tokens & visual identity
+**Description:** Define the visual language of the site — palette, typography, Tailwind theme extension, shadcn theme override. All subsequent UI tickets consume these tokens; none redefine them.
 **Acceptance criteria:**
-- Responsive navbar with site title, nav links (Home, Schedule, Info), language switcher
-- Footer with couple names and date
-- Mobile hamburger menu
-- Tailwind-based, clean design
-- Placeholder pages exist for all public routes
+- Color palette defined and documented: primary accent, background gradient, text colors, surface colors — inspired by the prototype (`#8b6f47` warm brown, `#fdfcfb → #e2d1c3` cream/beige)
+- Typography chosen: decorative serif for headings/display (e.g. Playfair Display or Cormorant Garamond), clean sans-serif for body (e.g. Inter) — Google Fonts imported
+- Tailwind CSS theme extended in `globals.css` with custom color and font tokens
+- shadcn/ui CSS variables (oklch) remapped to match the palette (buttons, cards, inputs match the wedding aesthetic, not default shadcn neutrals)
+- A `/dev/styles` page (dev-only, not linked in nav) renders: color swatches, typography scale (h1→p), all button variants, card, input, badge — living reference for all subsequent tickets
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
+
+#### T1.4 — Route groups & base layouts
+**Description:** Establish the full route group structure and each group's layout shell. No real content — placeholder pages only.
+**Acceptance criteria:**
+- Route groups created: `(gate)`, `(immersive)`, `(dashboard)` under `app/[locale]/`, and `admin/` at root
+- `(gate)` has no layout (or bare minimal — just `{children}`)
+- `(immersive)` has no layout (full-viewport, no chrome)
+- `(dashboard)` has a layout with: responsive navbar (site title, nav links: Home / Info / Seating / Gallery, language switcher, "Replay invitation" link), footer (couple names + date), mobile hamburger menu — using T1.3 design tokens
+- `admin/` has a separate layout: simple sidebar or top nav (links: Guests / Tables), logout button — visually distinct from the guest-facing site
+- Placeholder `page.tsx` exists for every route listed in the Route Architecture section
+- Navigating between dashboard pages works; navbar highlights the active route
+- Auth protection is **not** implemented yet (that's T2.3) — all pages are accessible for now
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
@@ -181,98 +232,58 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 
 ---
 
-### Epic 2 — Public Pages
+### Epic 2 — Authentication & Entry
 
-#### T2.1 — Landing page
-**Description:** The main public-facing page.
+#### T2.1 — Gate page
+**Description:** The only public-facing page. Shown to any unauthenticated user regardless of the route they tried to reach.
 **Acceptance criteria:**
-- Hero section with couple names, wedding date, venue name
-- Animated countdown timer to the wedding date
-- Welcome message (bilingual)
-- Call-to-action button for guests ("Access your space" → login)
-- At least one fun CSS animation (parallax, fade-in on scroll, or similar)
-- Fully responsive
+- Clean, on-brand page (uses T1.3 tokens) with a message asking the guest to scan their QR code
+- "Request my link" section: a form with email OR phone field — looks up the matching invitation and sends the token link (email via a simple transactional service, SMS via a provider like Twilio or just logged to console for now)
+- Fully bilingual
+- Responsive, works well on mobile (primary use case — guests will land here on their phones)
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
-#### T2.2 — Schedule / timeline page
-**Description:** Visual timeline of the wedding day.
+#### T2.2 — Token login & session
+**Description:** API route that validates a guest token, creates a session, and routes the guest to the right page.
 **Acceptance criteria:**
-- Vertical timeline component
-- Each event shows: time, title, location, short description, icon
-- Events data stored in translation files (bilingual)
-- Responsive (works well on mobile)
-- Placeholder data for: ceremony, cocktail hour, dinner, party
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
-
-#### T2.3 — Practical info page
-**Description:** All logistics guests need.
-**Acceptance criteria:**
-- Venue section with address and embedded map (Google Maps or OpenStreetMap iframe)
-- Transport / parking section
-- Accommodation suggestions (name, link, approximate price)
-- Dress code section
-- Contact section (email or phone for questions)
-- All text bilingual
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
-
-#### T2.4 — Photo gallery
-**Description:** A grid of couple photos.
-**Acceptance criteria:**
-- Responsive photo grid (masonry or uniform grid)
-- Lightbox on click (full-screen view with navigation)
-- Placeholder images for now
-- Lazy loading for performance
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
-
----
-
-### Epic 3 — Guest Authentication
-
-#### T3.1 — Token-based login endpoint
-**Description:** API route that validates a guest token and creates a session.
-**Acceptance criteria:**
-- `GET /login?token=<token>` validates token against DB
-- If valid: sets a secure HTTP-only cookie with session info (invitation ID, expiry)
-- Updates `lastLoginAt` in DB
-- Redirects to the private welcome page (`/fr/dashboard` or `/en/dashboard`)
-- If invalid: shows an error page ("Invalid or expired link")
+- `GET /api/login?token=<token>` validates token against DB
+- If valid:
+  - Sets a secure HTTP-only cookie with session payload (invitation ID, expiry)
+  - Updates `lastLoginAt` in DB
+  - If `invitationViewedAt` is null → redirect to `/{locale}/invitation`
+  - If `invitationViewedAt` is set → redirect to `/{locale}/home`
+- If invalid or expired: redirect to gate page with an error query param (`?error=invalid`)
 - Session duration: 30 days
+- Logout: `POST /api/logout` clears the cookie, redirects to gate page
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
-#### T3.2 — Auth middleware for private routes
-**Description:** Protect all private pages behind authentication.
+#### T2.3 — Auth middleware
+**Description:** Protect all guest and admin routes behind their respective authentication.
 **Acceptance criteria:**
-- Next.js middleware checks for valid session cookie on `/dashboard/*` routes
-- If no valid session: redirect to public landing page
-- Session validation checks expiry
-- Logout endpoint clears the cookie
+- Middleware runs on all `/{locale}/(immersive)/*` and `/{locale}/(dashboard)/*` routes
+- No valid guest session cookie → redirect to `/{locale}` (gate page)
+- Middleware runs on all `/admin/*` routes (except `/admin/login`)
+- No valid admin session cookie → redirect to `/admin/login`
+- Session validation checks expiry timestamp
+- Guest and admin cookies are fully independent (different names, different payloads)
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
-#### T3.3 — QR code generation utility
+#### T2.4 — QR code generation utility
 **Description:** Utility to generate QR codes from guest tokens.
 **Acceptance criteria:**
-- Function that takes a guest token and base URL, returns a QR code (PNG or SVG)
-- Can be called from admin panel or as a script
-- QR code encodes: `https://<base_url>/login?token=<token>`
-- Uses a library like `qrcode` (npm)
+- `lib/qrcode.ts`: function that takes a token + base URL, returns a QR code as SVG string or PNG Buffer
+- QR code encodes: `https://<base_url>/api/login?token=<token>`
+- Used by admin panel (T5.3, T5.4) — not exposed as a standalone page
+- Uses `qrcode` npm package
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
@@ -280,16 +291,38 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 
 ---
 
-### Epic 4 — Private Guest Pages
+### Epic 3 — Invitation Experience
 
-#### T4.1 — Guest dashboard / welcome page
-**Description:** The first page guests see after login.
+#### T3.1 — Cinematic invitation page
+**Description:** The emotional heart of the site. A full-viewport, scroll-driven experience guests see on first login — a direct Next.js port of the HTML prototype, bilingual, using T1.3 design tokens.
 **Acceptance criteria:**
-- Personalized greeting: "Hello, [name]!" (uses primary attendee name or group label)
-- RSVP status summary ("You have confirmed" / "Please RSVP below")
-- List of attendees in the invitation with their status
-- Quick links to RSVP form and seating map
-- Displayed in guest's preferred language
+- Full-viewport layout (no navbar, no footer — `(immersive)` route group)
+- Welcome splash screen with "Enter" button + confetti animation on click
+- Scroll-driven sections appearing/disappearing one at a time (matching prototype behaviour)
+- Sections: Save the Date → couple photo → wedding announcement → venue photo → date/time/location → dress code → celebration photo → map → final message
+- Interactive map with venue pin (Mapbox GL JS or OpenStreetMap/Leaflet — no API key required for Leaflet)
+- All text content from translation files (bilingual)
+- On first view: sets `invitationViewedAt` timestamp via `PATCH /api/invitation/viewed`
+- "Go to my space →" CTA button at the end leads to `/{locale}/home`
+- Accessible again from the dashboard ("Replay invitation" link)
+- Fully responsive, mobile-first
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
+
+---
+
+### Epic 4 — Guest Dashboard
+
+#### T4.1 — Dashboard home
+**Description:** Hub page guests land on after their first visit. Personalized, warm, functional.
+**Acceptance criteria:**
+- Personalized greeting: "Bonjour, [prénom] !" using the primary attendee name
+- RSVP status summary card: confirmed / pending / declined with a CTA if pending
+- Quick-access links to all dashboard sections (Info, RSVP, Seating, Gallery)
+- "Replay invitation" button → `/{locale}/invitation`
+- Displayed in guest's language (from `invitation.language`)
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
@@ -302,34 +335,60 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
   - Name (read-only)
   - Attending: Yes / No toggle
   - Dietary restrictions: checkboxes (Vegetarian, Vegan, Gluten-free, Allergies) + free text "Other" (shown only if attending)
-- If `allowPlusOne = true` on the invitation:
+- If `allowPlusOne = true`:
   - "Add a +1" button appears
   - +1 form: name (required), attending (defaults Yes), dietary restrictions
   - Guest can remove the +1 before or after submitting
 - Submits to `POST /api/rsvp`:
   - Updates `attending` and `dietaryRestrictions` for each attendee
   - Creates/updates/deletes the +1 attendee as needed
-  - Sets `rsvpStatus` on invitation to confirmed (if any attending) or declined (if none attending)
+  - Sets `rsvpStatus` on invitation to `confirmed` (if any attending) or `declined` (if none)
   - Sets `rsvpSubmittedAt` timestamp
 - Shows confirmation message with summary on success
 - Pre-fills with existing data if already submitted
-- Editable (guest can change their answer)
+- Editable (guest can update their answer)
 - Bilingual labels and validation messages
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
-#### T4.3 — Seating map page
-**Description:** Visual map showing table assignments.
+#### T4.3 — Practical info page
+**Description:** Everything guests need to know — schedule, venue, logistics. All content comes from translation files.
 **Acceptance criteria:**
-- SVG or canvas-based room layout with tables
-- Each table shows its number/label and attendee names
-- Current guest's table is highlighted (green dot / glow / different color)
+- Wedding day timeline / schedule section (vertical timeline component — time, title, location, icon)
+- Venue section: address, embedded map (Leaflet iframe or static map)
+- Transport & parking section
+- Accommodation suggestions (name, link, approximate price range)
+- Dress code section
+- Contact section (email or phone for questions)
+- All text bilingual, content defined in `messages/fr.json` and `messages/en.json`
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
+
+#### T4.4 — Seating map
+**Description:** Visual map of the room showing table assignments.
+**Acceptance criteria:**
+- SVG-based room layout with tables positioned using `Table.positionX/Y` from DB
+- Each table shows its number/label and the names of assigned attendees
+- Current guest's table is visually highlighted
 - "You are seated at Table X" banner at top
 - If no table assigned yet: "Table assignments coming soon" message
-- Scrollable and zoomable on mobile
-- Table data loaded from DB (or hardcoded JSON as initial step)
+- Scrollable and pinch-zoomable on mobile
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
+
+#### T4.5 — Photo gallery
+**Description:** A grid of couple photos with lightbox.
+**Acceptance criteria:**
+- Responsive photo grid (uniform grid or masonry)
+- Lightbox on click: full-screen view with prev/next navigation and close button
+- Placeholder images for now (replaced with real photos before the event)
+- Lazy loading for performance
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
@@ -345,9 +404,9 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Login page at `/admin/login`
 - Email + password form
 - Validates against `Admin` table (bcrypt hash comparison)
-- Sets admin session cookie
-- Redirects to admin dashboard
-- Seed script to create initial admin account
+- Sets admin session cookie (independent from guest cookie)
+- Redirects to `/admin/guests`
+- Seed script (`prisma/seed.ts`) to create the initial admin account
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
@@ -356,9 +415,9 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 #### T5.2 — Guest list dashboard
 **Description:** Overview of all invitations and their RSVP status.
 **Acceptance criteria:**
-- Summary cards: total invitations, confirmed, declined, pending, total headcount (sum of attending attendees)
-- Table listing all invitations with columns: group label, attendees (names), RSVP status, headcount, dietary restrictions, table, last login
-- Filters: by status (pending/confirmed/declined), by table assignment
+- Summary cards at top: total invitations, confirmed, declined, pending, total attending headcount
+- Table listing all invitations: group label, attendees (names), RSVP status, headcount, dietary flags, table assignment, last login
+- Filters: by RSVP status, by table assignment (assigned / unassigned)
 - Search by name or group label
 - Export to CSV button
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
@@ -367,29 +426,27 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T5.3 — Guest detail & manual override
-**Description:** View and edit individual invitation records.
+**Description:** View and edit an individual invitation record.
 **Acceptance criteria:**
-- Click an invitation in the list → detail view
-- Shows all fields: group label, language, allowPlusOne, RSVP status, table, last login, token
-- Lists all attendees with their attending status and dietary info
-- QR code preview for this invitation
-- Admin can:
-  - Edit group label, language, allowPlusOne, table number
-  - Add/remove/edit attendees
-  - Manually override RSVP status and attendee details
-- Save button updates the DB
+- Accessible from guest list: click a row → `/admin/guests/[id]`
+- Shows all invitation fields: group label, email, phone, language, allowPlusOne, RSVP status, table, last login, invitationViewedAt, token
+- Lists all attendees with attending status and dietary info
+- QR code preview (uses T2.4 utility)
+- Admin can edit: group label, email, phone, language, allowPlusOne, table number
+- Admin can add/remove/edit attendees and manually override RSVP status and dietary details
+- Save → `PATCH /api/admin/invitations/[id]`
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
 #### T5.4 — QR code bulk export
-**Description:** Generate and download QR codes for all invitations.
+**Description:** Generate and download QR codes for all invitations at once.
 **Acceptance criteria:**
-- Button on admin dashboard: "Export all QR codes"
-- Generates a PDF with one QR code per invitation (group label + QR code)
-- Also supports individual QR download from guest detail page
-- Uses the utility from T3.3
+- "Export all QR codes" button on `/admin/guests`
+- Generates a PDF: one page per invitation, showing group label + QR code
+- Individual QR download also available on the guest detail page
+- Uses the utility from T2.4
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
@@ -400,9 +457,9 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 ### Epic 6 — Table Assignment (Bonus)
 
 #### T6.1 — Table management CRUD
-**Description:** Admin can create, edit, delete tables.
+**Description:** Admin can create, edit and delete tables.
 **Acceptance criteria:**
-- Admin page to manage tables
+- Admin page at `/admin/tables`
 - Create table: number, label, capacity, position (x, y)
 - Edit and delete existing tables
 - Validation: table number must be unique
@@ -414,12 +471,12 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 #### T6.2 — Drag-and-drop table assignment
 **Description:** Visual interface to assign invitations to tables.
 **Acceptance criteria:**
-- Left panel: unassigned invitations list (with attendee count)
-- Right panel: visual table map (same as guest-facing seating map)
-- Drag an invitation onto a table to assign
+- Left panel: unassigned invitations list with attendee count
+- Right panel: visual table map (same layout as T4.4)
+- Drag an invitation onto a table to assign it
 - Table shows current occupancy vs capacity
-- Warning when table exceeds capacity
-- Changes saved to DB on drop
+- Warning indicator when a table exceeds capacity
+- Changes saved to DB on drop (`PATCH /api/admin/invitations/[id]`)
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
@@ -430,24 +487,30 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 ## Ticket Dependency Graph
 
 ```
-T1.1 ──► T1.2 ──► T1.3
-  │
-  ├──► T2.1, T2.2, T2.3, T2.4  (public pages, parallel, after T1.3)
-  │
-  ├──► T3.1 ──► T3.2 ──► T4.1 ──► T4.2
-  │      │                         T4.3
-  │      └──► T3.3
-  │
-  ├──► T5.1 ──► T5.2 ──► T5.3
-  │              T5.4 (needs T3.3)
-  │
-  └──► T6.1 ──► T6.2  (bonus, after T5.x and T4.3)
+T1.1 ──► T1.2 ──► T1.3 ──► T1.4
+                              │
+              ┌───────────────┼───────────────┐
+              ▼               ▼               ▼
+            T2.1            T2.2           T5.1
+                              │               │
+                            T2.3           T5.2 ──► T5.3
+                              │               │
+                    ┌─────────┤            T5.4 (needs T2.4)
+                    ▼         ▼
+                  T2.4      T3.1
+                              │
+                            T4.1
+                              │
+              ┌───────────────┼──────────────┐
+              ▼               ▼              ▼
+            T4.2            T4.3           T4.4 ──► T6.1 ──► T6.2
+            T4.5
 ```
 
 ### Suggested implementation order
-1. **T1.1 → T1.2 → T1.3** (foundation)
-2. **T2.1 → T2.2 → T2.3 → T2.4** (public pages — visible progress fast)
-3. **T3.1 → T3.2 → T3.3** (auth system)
-4. **T4.1 → T4.2 → T4.3** (private guest pages)
-5. **T5.1 → T5.2 → T5.3 → T5.4** (admin panel)
-6. **T6.1 → T6.2** (bonus — table assignment UI)
+1. **T1.1 → T1.2 → T1.3 → T1.4** — foundation + design + layouts
+2. **T2.1 → T2.2 → T2.3 → T2.4** — auth system + gate page
+3. **T3.1** — cinematic invitation experience
+4. **T4.1 → T4.2 → T4.3 → T4.4 → T4.5** — guest dashboard
+5. **T5.1 → T5.2 → T5.3 → T5.4** — admin panel
+6. **T6.1 → T6.2** — bonus: drag-and-drop table assignment
