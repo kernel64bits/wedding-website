@@ -32,8 +32,9 @@ docker compose exec app npx shadcn@latest add <component>
 The file appears in `components/ui/` on your host. Commit it.
 
 **Add an npm package**
-1. Add it to `package.json`
-2. Rebuild: `docker compose up --build`
+1. Add it to `package.json` and delete `package-lock.json`
+2. Rebuild: `docker compose down -v && docker compose up --build`
+3. Extract the regenerated lock file: `docker run --rm wedding-website-app cat /app/package-lock.json > package-lock.json`
 
 **Update the database schema**
 1. Edit `prisma/schema.prisma`

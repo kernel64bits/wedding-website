@@ -119,7 +119,7 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - `docker compose up --build` — builds image and starts dev server on http://localhost:3000
 - `docker compose exec app npx prisma db push` — initializes the SQLite database
 - Day-to-day: `docker compose up` (hot reload via bind mount + WATCHPACK_POLLING)
-- Adding new npm packages: update `package.json` + Dockerfile, then `docker compose up --build`
+- Adding new npm packages: add to `package.json`, delete `package-lock.json`, then `docker compose down -v && docker compose up --build` (the `-v` drops the stale `node_modules` volume)
 - Adding new shadcn/ui components: `docker compose exec app npx shadcn@latest add <component>` — writes into `components/ui/` via bind mount, then commit the file
 
 **Key files created:**
