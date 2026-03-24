@@ -4,10 +4,13 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default async function GatePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { locale } = await params;
+  const { error } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("gate");
 
@@ -32,6 +35,12 @@ export default async function GatePage({
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
           {t("instruction")}
         </p>
+
+        {error === "invalid_token" && (
+          <p className="mt-6 text-sm text-destructive">
+            {t("invalidToken")}
+          </p>
+        )}
       </div>
     </div>
   );

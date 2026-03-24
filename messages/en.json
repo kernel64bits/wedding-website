@@ -9,7 +9,8 @@
   "gate": {
     "title": "Sophie & John",
     "subtitle": "Wedding · June 2026",
-    "instruction": "To access the website, please scan the QR code from your invitation."
+    "instruction": "To access the website, please scan the QR code from your invitation.",
+    "invalidToken": "Invalid or expired link. Please scan your QR code again."
   },
   "home": {
     "title": "Our Wedding",

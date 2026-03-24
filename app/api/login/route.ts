@@ -1,0 +1,43 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { createSessionValue, GUEST_COOKIE } from "@/lib/session";
+
+const SESSION_MAX_AGE_S = 30 * 24 * 60 * 60;
+
+export async function GET(request: NextRequest) {
+  const token = request.nextUrl.searchParams.get("token");
+  const invalidUrl = new URL("/fr?error=invalid_token", request.url);
+
+  if (!token) {
+    return NextResponse.redirect(invalidUrl);
+  }
+
+  const invitation = await prisma.invitation.findUnique({
+    where: { token },
+  });
+
+  if (!invitation) {
+    return NextResponse.redirect(invalidUrl);
+  }
+
+  const locale = invitation.language ?? "fr";
+  const destination = invitation.invitationViewedAt === null
+    ? `/${locale}/invitation`
+    : `/${locale}/home`;
+
+  await prisma.invitation.update({
+    where: { id: invitation.id },
+    data: { lastLoginAt: new Date() },
+  });
+
+  const response = NextResponse.redirect(new URL(destination, request.url));
+  response.cookies.set(GUEST_COOKIE, createSessionValue(invitation.id), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: SESSION_MAX_AGE_S,
+    path: "/",
+  });
+
+  return response;
+}

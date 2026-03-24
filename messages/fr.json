@@ -9,7 +9,8 @@
   "gate": {
     "title": "Sophie & John",
     "subtitle": "Mariage · Juin 2026",
-    "instruction": "Pour accéder au site, veuillez scanner le QR code reçu dans votre invitation."
+    "instruction": "Pour accéder au site, veuillez scanner le QR code reçu dans votre invitation.",
+    "invalidToken": "Lien invalide ou expiré. Veuillez rescanner votre QR code."
   },
   "home": {
     "title": "Notre Mariage",
