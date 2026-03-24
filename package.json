@@ -10,12 +10,14 @@
     "db:seed": "node prisma/seed.mjs"
   },
   "dependencies": {
-    "@prisma/client": "^6.6.0",
+    "@libsql/client": "^0.15.4",
+    "@prisma/adapter-libsql": "^7.5.0",
+    "@prisma/client": "^7.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
-    "next": "^15.3.2",
-    "next-intl": "^3.26.3",
+    "next": "^16.2.1",
+    "next-intl": "^4.8.3",
     "radix-ui": "^1.4.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -26,7 +28,7 @@
     "@types/node": "^22.15.3",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "prisma": "^6.6.0",
+    "prisma": "^7.5.0",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"
   }
