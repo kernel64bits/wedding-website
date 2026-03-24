@@ -1,4 +1,8 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { getGuestSession } from "@/lib/session";
+import { prisma } from "@/lib/prisma";
+import { RsvpForm } from "@/components/rsvp-form";
 
 export default async function RsvpPage({
   params,
@@ -8,12 +12,29 @@ export default async function RsvpPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  const session = await getGuestSession();
+  if (!session) redirect(`/${locale}`);
+
+  const [invitation, settings] = await Promise.all([
+    prisma.invitation.findUnique({
+      where: { id: session.invitationId },
+      include: { attendees: true },
+    }),
+    prisma.settings.upsert({
+      where: { id: "singleton" },
+      create: { id: "singleton" },
+      update: {},
+    }),
+  ]);
+
+  if (!invitation) redirect(`/${locale}`);
+
+  const t = await getTranslations("rsvpForm");
+
   return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="text-center space-y-2">
-        <h1 className="font-serif text-4xl font-light">RSVP</h1>
-        <p className="text-muted-foreground">Coming in T4.2</p>
-      </div>
+    <div className="mx-auto max-w-2xl px-6 py-12 space-y-8">
+      <h1 className="font-serif text-4xl font-light">{t("title")}</h1>
+      <RsvpForm invitation={invitation} rsvpLocked={settings.rsvpLocked === true} />
     </div>
   );
 }

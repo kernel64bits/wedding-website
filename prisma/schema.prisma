@@ -50,3 +50,8 @@ model Table {
   positionY Float
   capacity  Int
 }
+
+model Settings {
+  id         String  @id @default("singleton")
+  rsvpLocked Boolean @default(false)
+}

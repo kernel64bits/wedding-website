@@ -20,14 +20,41 @@
   "common": {
     "switchLang": "FR"
   },
+  "rsvpForm": {
+    "title": "RSVP",
+    "attending": "Attending",
+    "notAttending": "Not attending",
+    "dietary": "Dietary requirements",
+    "dietaryNote": "The meal is vegetarian by default. Please let us know if you have any of the following:",
+    "dietaryOptions": {
+      "vegan": "Vegan",
+      "glutenFree": "Gluten-free",
+      "nuts": "Nut allergy"
+    },
+    "otherDietary": "Other allergy or restriction",
+    "addPlusOne": "+ Add a guest",
+    "removePlusOne": "Remove guest",
+    "plusOneName": "Full name",
+    "submit": "Send my RSVP",
+    "update": "Update my response",
+    "successTitle": "RSVP confirmed",
+    "successBody": "Thank you for your response, see you soon!",
+    "nameRequired": "Name is required",
+    "locked": "Responses are now closed. Thank you for replying!",
+    "error": "Something went wrong, please try again."
+  },
   "dashboard": {
     "greeting": "Hello, {name}!",
+    "eventDetails": {
+      "title": "The wedding"
+    },
     "rsvp": {
       "title": "Your RSVP",
       "pending": "Awaiting your response",
       "confirmed": "Attendance confirmed",
       "declined": "Attendance declined",
-      "cta": "Confirm attendance →"
+      "cta": "Confirm attendance →",
+      "update": "Update my response →"
     }
   },
   "invitation": {

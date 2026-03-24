@@ -20,14 +20,41 @@
   "common": {
     "switchLang": "EN"
   },
+  "rsvpForm": {
+    "title": "RSVP",
+    "attending": "Présent(e)",
+    "notAttending": "Absent(e)",
+    "dietary": "Régime alimentaire",
+    "dietaryNote": "Le repas est végétarien par défaut. Merci de préciser si besoin\u00a0:",
+    "dietaryOptions": {
+      "vegan": "Vegan",
+      "glutenFree": "Sans gluten",
+      "nuts": "Allergie aux fruits à coque"
+    },
+    "otherDietary": "Autre allergie ou restriction",
+    "addPlusOne": "+ Ajouter un accompagnant",
+    "removePlusOne": "Retirer l'accompagnant",
+    "plusOneName": "Prénom et nom",
+    "submit": "Envoyer mon RSVP",
+    "update": "Modifier ma réponse",
+    "successTitle": "RSVP enregistré",
+    "successBody": "Merci pour votre réponse, à très bientôt\u00a0!",
+    "nameRequired": "Le nom est requis",
+    "locked": "Les réponses sont maintenant fermées. Merci d'avoir répondu\u00a0!",
+    "error": "Une erreur est survenue, veuillez réessayer."
+  },
   "dashboard": {
     "greeting": "Bonjour, {name}\u00a0!",
+    "eventDetails": {
+      "title": "Le mariage"
+    },
     "rsvp": {
       "title": "Votre RSVP",
       "pending": "En attente de votre réponse",
       "confirmed": "Présence confirmée",
       "declined": "Absence confirmée",
-      "cta": "Confirmer ma présence →"
+      "cta": "Confirmer ma présence →",
+      "update": "Modifier ma réponse →"
     }
   },
   "invitation": {

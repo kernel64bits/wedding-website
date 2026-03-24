@@ -344,7 +344,7 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [x] Post-ticket check: refactor opportunities identified and addressed
 - [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T4.2 — RSVP form
+#### T4.2 — RSVP form ✅
 **Description:** Form for guests to confirm attendance and provide details per attendee.
 **Acceptance criteria:**
 - For each pre-registered attendee in the invitation:
@@ -364,10 +364,10 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Pre-fills with existing data if already submitted
 - Editable (guest can update their answer)
 - Bilingual labels and validation messages
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 #### T4.3 — Practical info page
 **Description:** Everything guests need to know — schedule, venue, logistics. All content comes from translation files.
