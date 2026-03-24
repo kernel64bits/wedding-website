@@ -108,8 +108,10 @@ Table {
 - `prisma db push` creates the database
 - Basic folder structure in place (`/app`, `/components`, `/lib`, `/prisma`)
 - Project runs with `npm run dev`
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 **Implementation details:**
 
@@ -159,8 +161,10 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Translation files created (`messages/fr.json`, `messages/en.json`) with placeholder keys
 - Language switcher component (FR/EN toggle) in a shared layout
 - Middleware redirects `/` to `/fr`
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 #### T1.3 — Base layout and navigation
 **Description:** Create the shared layout (header, footer, nav) used across all public pages.
@@ -170,6 +174,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Mobile hamburger menu
 - Tailwind-based, clean design
 - Placeholder pages exist for all public routes
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -186,6 +192,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Call-to-action button for guests ("Access your space" → login)
 - At least one fun CSS animation (parallax, fade-in on scroll, or similar)
 - Fully responsive
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -197,6 +205,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Events data stored in translation files (bilingual)
 - Responsive (works well on mobile)
 - Placeholder data for: ceremony, cocktail hour, dinner, party
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -209,6 +219,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Dress code section
 - Contact section (email or phone for questions)
 - All text bilingual
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -219,6 +231,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Lightbox on click (full-screen view with navigation)
 - Placeholder images for now
 - Lazy loading for performance
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -235,6 +249,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Redirects to the private welcome page (`/fr/dashboard` or `/en/dashboard`)
 - If invalid: shows an error page ("Invalid or expired link")
 - Session duration: 30 days
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -245,6 +261,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - If no valid session: redirect to public landing page
 - Session validation checks expiry
 - Logout endpoint clears the cookie
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -255,6 +273,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Can be called from admin panel or as a script
 - QR code encodes: `https://<base_url>/login?token=<token>`
 - Uses a library like `qrcode` (npm)
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -270,6 +290,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - List of attendees in the invitation with their status
 - Quick links to RSVP form and seating map
 - Displayed in guest's preferred language
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -293,6 +315,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Pre-fills with existing data if already submitted
 - Editable (guest can change their answer)
 - Bilingual labels and validation messages
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -306,6 +330,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - If no table assigned yet: "Table assignments coming soon" message
 - Scrollable and zoomable on mobile
 - Table data loaded from DB (or hardcoded JSON as initial step)
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -322,6 +348,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Sets admin session cookie
 - Redirects to admin dashboard
 - Seed script to create initial admin account
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -333,6 +361,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Filters: by status (pending/confirmed/declined), by table assignment
 - Search by name or group label
 - Export to CSV button
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -348,6 +378,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
   - Add/remove/edit attendees
   - Manually override RSVP status and attendee details
 - Save button updates the DB
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -358,6 +390,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Generates a PDF with one QR code per invitation (group label + QR code)
 - Also supports individual QR download from guest detail page
 - Uses the utility from T3.3
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -372,6 +406,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Create table: number, label, capacity, position (x, y)
 - Edit and delete existing tables
 - Validation: table number must be unique
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
@@ -384,6 +420,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Table shows current occupancy vs capacity
 - Warning when table exceeds capacity
 - Changes saved to DB on drop
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 

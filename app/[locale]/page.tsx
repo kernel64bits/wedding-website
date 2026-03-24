@@ -9,11 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function Home({
-  params: { locale },
+export default async function Home({
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   setRequestLocale(locale);
   const t = useTranslations("home");
 
