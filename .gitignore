@@ -23,6 +23,9 @@ next-env.d.ts
 .DS_Store
 *.pem
 
+# claude code — local settings contain machine-specific paths and session tokens
+.claude/settings.local.json
+
 # debug
 npm-debug.log*
 
