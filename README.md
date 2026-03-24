@@ -2,7 +2,7 @@
 
 A bilingual (FR/EN) wedding website with a public section, a private guest area (RSVP, seating map), and an admin panel.
 
-**Stack:** Next.js 15 · Tailwind CSS v4 · shadcn/ui · Prisma · SQLite · Docker
+**Stack:** Next.js 16 · Tailwind CSS v4 · shadcn/ui · Prisma 7 · SQLite · Docker
 
 ---
 
@@ -39,6 +39,18 @@ The file appears in `components/ui/` on your host. Commit it.
 **Update the database schema**
 1. Edit `prisma/schema.prisma`
 2. Push: `docker compose exec app npx prisma db push`
+
+**Browse the database (Prisma Studio)**
+```bash
+docker compose exec app npx prisma studio --browser none --port 5555
+```
+Then open http://localhost:5555 in your browser.
+
+**Seed test data**
+```bash
+docker compose exec app node prisma/seed.mjs
+```
+Creates a test invitation with token `test-token-123`. Never run in production.
 
 ---
 
