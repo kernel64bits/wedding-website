@@ -1,9 +1,10 @@
 {
   "nav": {
     "home": "Accueil",
-    "schedule": "Programme",
-    "info": "Infos pratiques",
-    "gallery": "Galerie"
+    "info": "Informations",
+    "seating": "Plan de table",
+    "gallery": "Photos",
+    "replay": "Revoir l'invitation"
   },
   "home": {
     "title": "Notre Mariage",

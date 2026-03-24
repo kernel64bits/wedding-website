@@ -1,9 +1,10 @@
 {
   "nav": {
     "home": "Home",
-    "schedule": "Schedule",
-    "info": "Practical info",
-    "gallery": "Gallery"
+    "info": "Info",
+    "seating": "Seating",
+    "gallery": "Gallery",
+    "replay": "Replay invitation"
   },
   "home": {
     "title": "Our Wedding",

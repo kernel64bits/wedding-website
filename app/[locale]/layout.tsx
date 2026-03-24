@@ -3,7 +3,6 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { THEME } from "@/lib/theme.config";
 
 const cormorant = Cormorant_Garamond({
@@ -44,9 +43,6 @@ export default async function LocaleLayout({
     <html lang={locale} className={`${cormorant.variable} ${inter.variable} ${THEME}`}>
       <body className="antialiased">
         <NextIntlClientProvider messages={messages}>
-          <div className="fixed top-4 right-4 z-50">
-            <LanguageSwitcher />
-          </div>
           {children}
         </NextIntlClientProvider>
       </body>
