@@ -6,7 +6,7 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "db:seed": "node prisma/seed.mjs"
   },
   "dependencies": {
@@ -28,6 +28,8 @@
     "@types/node": "^22.15.3",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.1",
     "prisma": "^7.5.0",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"

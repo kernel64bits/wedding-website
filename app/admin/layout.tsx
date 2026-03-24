@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 
@@ -23,18 +24,18 @@ export default function AdminLayout({
         <div className="flex min-h-screen flex-col">
           <nav className="h-14 border-b border-border bg-card flex items-center gap-6 px-6">
             <span className="text-sm font-semibold tracking-wide">Admin</span>
-            <a
+            <Link
               href="/admin/guests"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Guests
-            </a>
-            <a
+            </Link>
+            <Link
               href="/admin/tables"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               Tables
-            </a>
+            </Link>
             <div className="ml-auto">
               <a
                 href="#"
