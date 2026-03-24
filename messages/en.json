@@ -54,7 +54,8 @@
       "confirmed": "Attendance confirmed",
       "declined": "Attendance declined",
       "cta": "Confirm attendance →",
-      "update": "Update my response →"
+      "update": "Update my response →",
+      "locked": "Responses are now closed."
     }
   },
   "invitation": {

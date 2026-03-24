@@ -20,11 +20,20 @@ export default async function HomePage({
   const session = await getGuestSession();
   if (!session) redirect(`/${locale}`);
 
-  const invitation = await prisma.invitation.findUnique({
-    where: { id: session.invitationId },
-    include: { attendees: true },
-  });
+  const [invitation, settings] = await Promise.all([
+    prisma.invitation.findUnique({
+      where: { id: session.invitationId },
+      include: { attendees: true },
+    }),
+    prisma.settings.upsert({
+      where: { id: "singleton" },
+      create: { id: "singleton" },
+      update: {},
+    }),
+  ]);
   if (!invitation) redirect(`/${locale}`);
+
+  const rsvpLocked = settings.rsvpLocked === true;
 
   const [t, tRsvp, tInvitation] = await Promise.all([
     getTranslations("dashboard"),
@@ -102,17 +111,21 @@ export default async function HomePage({
             </ul>
           )}
 
-          <div>
-            {rsvpStatus === "pending" ? (
-              <Button asChild size="sm">
-                <Link href="/rsvp">{t("rsvp.cta")}</Link>
-              </Button>
-            ) : (
-              <Button asChild size="sm" variant="outline">
-                <Link href="/rsvp">{t("rsvp.update")}</Link>
-              </Button>
-            )}
-          </div>
+          {rsvpLocked ? (
+            <p className="text-xs text-muted-foreground">{t("rsvp.locked")}</p>
+          ) : (
+            <div>
+              {rsvpStatus === "pending" ? (
+                <Button asChild size="sm">
+                  <Link href="/rsvp">{t("rsvp.cta")}</Link>
+                </Button>
+              ) : (
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/rsvp">{t("rsvp.update")}</Link>
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

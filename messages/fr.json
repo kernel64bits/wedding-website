@@ -54,7 +54,8 @@
       "confirmed": "Présence confirmée",
       "declined": "Absence confirmée",
       "cta": "Confirmer ma présence →",
-      "update": "Modifier ma réponse →"
+      "update": "Modifier ma réponse →",
+      "locked": "Les réponses sont fermées."
     }
   },
   "invitation": {
