@@ -16,7 +16,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.2.0",
-    "lucide-react": "^0.475.0"
+    "lucide-react": "^0.475.0",
+    "next-intl": "^3.26.3"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

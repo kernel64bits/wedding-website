@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "schedule": "Programme",
+    "info": "Infos pratiques",
+    "gallery": "Galerie"
+  },
+  "home": {
+    "title": "Notre Mariage",
+    "subtitle": "Rejoignez-nous pour célébrer ce moment unique",
+    "cta": "Accéder à votre espace"
+  },
+  "common": {
+    "switchLang": "EN"
+  }
+}

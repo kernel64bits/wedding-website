@@ -151,7 +151,7 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - `prisma db push` as runtime step (DB file lives on host via bind mount)
 - No `create-next-app` — config files written directly for Docker compatibility
 
-#### T1.2 — Set up i18n with next-intl
+#### T1.2 — Set up i18n with next-intl ✅
 **Description:** Configure bilingual support (FR/EN).
 **Acceptance criteria:**
 - next-intl configured with URL prefix strategy (`/fr/...`, `/en/...`)

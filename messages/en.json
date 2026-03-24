@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "home": "Home",
+    "schedule": "Schedule",
+    "info": "Practical info",
+    "gallery": "Gallery"
+  },
+  "home": {
+    "title": "Our Wedding",
+    "subtitle": "Join us to celebrate this unique moment",
+    "cta": "Access your space"
+  },
+  "common": {
+    "switchLang": "FR"
+  }
+}
