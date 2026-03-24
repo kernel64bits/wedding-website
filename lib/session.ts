@@ -23,23 +23,25 @@ export interface AdminSession {
 
 // ── HMAC signing (shared) ─────────────────────────────────────────────────────
 
+function secret(): string {
+  const s = process.env.SESSION_SECRET;
+  if (!s) throw new Error("SESSION_SECRET environment variable is not set");
+  return s;
+}
+
 function hmacSign(payload: object): string {
   const b64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  const sig = createHmac("sha256", process.env.SESSION_SECRET!)
-    .update(b64)
-    .digest("hex");
+  const sig = createHmac("sha256", secret()).update(b64).digest("hex");
   return `${b64}.${sig}`;
 }
 
-function hmacVerify<T extends object>(token: string): T | null {
+function hmacVerify<T extends { expiresAt: number }>(token: string): T | null {
   const dot = token.lastIndexOf(".");
   if (dot === -1) return null;
 
   const b64 = token.slice(0, dot);
   const sig = token.slice(dot + 1);
-  const expected = createHmac("sha256", process.env.SESSION_SECRET!)
-    .update(b64)
-    .digest("hex");
+  const expected = createHmac("sha256", secret()).update(b64).digest("hex");
 
   try {
     if (!timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex")))
@@ -48,12 +50,14 @@ function hmacVerify<T extends object>(token: string): T | null {
     return null;
   }
 
-  const payload = JSON.parse(Buffer.from(b64, "base64url").toString()) as T & {
-    expiresAt: number;
-  };
-
-  if (Date.now() > payload.expiresAt) return null;
-  return payload;
+  try {
+    const payload = JSON.parse(Buffer.from(b64, "base64url").toString()) as T;
+    if (typeof payload.expiresAt !== "number" || Date.now() > payload.expiresAt)
+      return null;
+    return payload;
+  } catch {
+    return null;
+  }
 }
 
 // ── Guest session API ─────────────────────────────────────────────────────────
