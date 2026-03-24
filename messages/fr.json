@@ -23,7 +23,36 @@
   "invitation": {
     "enter": "Entrer",
     "saveTheDate": {
-      "label": "Réservez cette date"
+      "label": "Réservez cette date",
+      "date": "15 Juin 2026"
+    },
+    "announcement": {
+      "heading": "Nous nous marions\u00a0!",
+      "body": "Avec joie et amour, nous vous convions à partager ce moment inoubliable avec nous."
+    },
+    "details": {
+      "heading": "Les détails",
+      "dateLabel": "Date",
+      "date": "Samedi 15 Juin 2026",
+      "timeLabel": "Heure",
+      "venueLabel": "Lieu",
+      "time": "15h00",
+      "venueName": "Domaine des Roses",
+      "address": "1 Chemin des Mariés, 75000 Paris"
+    },
+    "story": {
+      "heading": "Notre histoire",
+      "body": "D'une rencontre improbable à une vie partagée — chaque chapitre a été écrit avec amour. Nous avons hâte de partager le suivant avec vous."
+    },
+    "celebration": {
+      "heading": "La fête",
+      "body": "Une soirée de dîner, de danse et de joie vous attend. Nous avons pensé à chaque détail pour que vous puissiez simplement profiter de ce moment.",
+      "dresscode": "Code vestimentaire\u00a0: élégance jardin"
+    },
+    "closing": {
+      "heading": "À très bientôt",
+      "body": "Nous avons hâte de célébrer avec vous.",
+      "cta": "Accéder à mon espace →"
     }
   }
 }

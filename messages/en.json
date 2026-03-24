@@ -23,7 +23,36 @@
   "invitation": {
     "enter": "Enter",
     "saveTheDate": {
-      "label": "Save the Date"
+      "label": "Save the Date",
+      "date": "June 15, 2026"
+    },
+    "announcement": {
+      "heading": "We're getting married!",
+      "body": "With joy and love, we invite you to share this unforgettable moment with us."
+    },
+    "details": {
+      "heading": "Details",
+      "dateLabel": "Date",
+      "date": "Saturday, June 15, 2026",
+      "timeLabel": "Time",
+      "venueLabel": "Venue",
+      "time": "3:00 PM",
+      "venueName": "Domaine des Roses",
+      "address": "1 Chemin des Mariés, 75000 Paris"
+    },
+    "story": {
+      "heading": "Our story",
+      "body": "From a chance encounter to a lifetime together — every chapter has been written with love. We cannot wait to share the next one with you."
+    },
+    "celebration": {
+      "heading": "The celebration",
+      "body": "An evening of dinner, dancing, and joy awaits. We have planned every detail so you can simply be present with us.",
+      "dresscode": "Dress code: garden elegance"
+    },
+    "closing": {
+      "heading": "See you soon",
+      "body": "We cannot wait to celebrate with you.",
+      "cta": "Go to my space →"
     }
   }
 }

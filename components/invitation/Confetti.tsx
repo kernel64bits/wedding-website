@@ -71,7 +71,7 @@ const lerp = (t: number, lo: number, hi: number) => lo + t * (hi - lo);
 const STEPS         = 12;
 const K_TIMES       = Array.from({ length: STEPS }, (_, s) => s / (STEPS - 1));
 const INITIAL       = { x: 0, y: 0, rotate: 0, opacity: 0, scale: 1 } as const;
-const OPACITY_TIMES = [0, 0.04, 0.6, 0.85, 1] as const;
+const OPACITY_TIMES: number[] = [0, 0.04, 0.6, 0.85, 1];
 
 function buildParticles(cfg: ConfettiConfig) {
   const halfSpread = (cfg.angleSpread / 2) * (Math.PI / 180);
