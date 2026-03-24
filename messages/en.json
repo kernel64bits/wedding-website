@@ -19,5 +19,11 @@
   },
   "common": {
     "switchLang": "FR"
+  },
+  "invitation": {
+    "enter": "Enter",
+    "saveTheDate": {
+      "label": "Save the Date"
+    }
   }
 }
