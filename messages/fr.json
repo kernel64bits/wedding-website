@@ -6,6 +6,11 @@
     "gallery": "Photos",
     "replay": "Revoir l'invitation"
   },
+  "gate": {
+    "title": "Sophie & John",
+    "subtitle": "Mariage · Juin 2026",
+    "instruction": "Pour accéder au site, veuillez scanner le QR code reçu dans votre invitation."
+  },
   "home": {
     "title": "Notre Mariage",
     "subtitle": "Rejoignez-nous pour célébrer ce moment unique",

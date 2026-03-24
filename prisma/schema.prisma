@@ -16,8 +16,9 @@ model Invitation {
   allowPlusOne    Boolean    @default(false)
   rsvpStatus      String     @default("pending")
   tableNumber     Int?
-  lastLoginAt     DateTime?
-  rsvpSubmittedAt DateTime?
+  invitationViewedAt DateTime?
+  lastLoginAt        DateTime?
+  rsvpSubmittedAt    DateTime?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   attendees       Attendee[]

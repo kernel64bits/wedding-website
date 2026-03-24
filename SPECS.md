@@ -289,6 +289,20 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
 
+#### T2.5 — Request link by email/SMS (optional)
+**Description:** Let guests without their QR code request their personal link via email or SMS.
+**Acceptance criteria:**
+- Gate page gains a "Don't have your QR code?" collapsible section
+- Form with a single field: email or phone number
+- `POST /api/request-link` looks up invitation by email or phone, sends the token link
+- Email via a transactional provider (Resend, Postmark…); SMS via Twilio or similar — logged to console until a provider is wired up
+- Requires adding `phone: String?` to the `Invitation` schema
+- Fully bilingual
+- [ ] Post-ticket check: acceptance criteria verified (functional test)
+- [ ] Post-ticket check: code quality reviewed
+- [ ] Post-ticket check: refactor opportunities identified and addressed
+- [ ] Post-ticket check: directory layout is clean and well-organized
+
 ---
 
 ### Epic 3 — Invitation Experience
