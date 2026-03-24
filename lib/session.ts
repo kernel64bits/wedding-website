@@ -1,15 +1,29 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 
+// ── Guest session ─────────────────────────────────────────────────────────────
+
 export const GUEST_COOKIE = "wedding_session";
-const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const GUEST_SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export interface GuestSession {
   invitationId: string;
   expiresAt: number; // Unix ms
 }
 
-function sign(payload: GuestSession): string {
+// ── Admin session ─────────────────────────────────────────────────────────────
+
+export const ADMIN_COOKIE = "wedding_admin_session";
+const ADMIN_SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
+
+export interface AdminSession {
+  adminId: string;
+  expiresAt: number; // Unix ms
+}
+
+// ── HMAC signing (shared) ─────────────────────────────────────────────────────
+
+function hmacSign(payload: object): string {
   const b64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const sig = createHmac("sha256", process.env.SESSION_SECRET!)
     .update(b64)
@@ -17,7 +31,7 @@ function sign(payload: GuestSession): string {
   return `${b64}.${sig}`;
 }
 
-function verify(token: string): GuestSession | null {
+function hmacVerify<T extends object>(token: string): T | null {
   const dot = token.lastIndexOf(".");
   if (dot === -1) return null;
 
@@ -34,21 +48,46 @@ function verify(token: string): GuestSession | null {
     return null;
   }
 
-  const payload = JSON.parse(
-    Buffer.from(b64, "base64url").toString()
-  ) as GuestSession;
+  const payload = JSON.parse(Buffer.from(b64, "base64url").toString()) as T & {
+    expiresAt: number;
+  };
 
   if (Date.now() > payload.expiresAt) return null;
   return payload;
 }
 
+// ── Guest session API ─────────────────────────────────────────────────────────
+
 export function createSessionValue(invitationId: string): string {
-  return sign({ invitationId, expiresAt: Date.now() + SESSION_DURATION_MS });
+  return hmacSign({
+    invitationId,
+    expiresAt: Date.now() + GUEST_SESSION_DURATION_MS,
+  });
 }
 
+/** Verify a raw guest cookie string. Safe to call in proxy.ts (no next/headers). */
+export function verifyGuestToken(raw: string): GuestSession | null {
+  return hmacVerify<GuestSession>(raw);
+}
+
+/** Read and verify the guest session from the request cookie jar (server components). */
 export async function getGuestSession(): Promise<GuestSession | null> {
   const jar = await cookies();
   const raw = jar.get(GUEST_COOKIE)?.value;
   if (!raw) return null;
-  return verify(raw);
+  return verifyGuestToken(raw);
+}
+
+// ── Admin session API ─────────────────────────────────────────────────────────
+
+export function createAdminSessionValue(adminId: string): string {
+  return hmacSign({
+    adminId,
+    expiresAt: Date.now() + ADMIN_SESSION_DURATION_MS,
+  });
+}
+
+/** Verify a raw admin cookie string. Safe to call in proxy.ts (no next/headers). */
+export function verifyAdminToken(raw: string): AdminSession | null {
+  return hmacVerify<AdminSession>(raw);
 }
