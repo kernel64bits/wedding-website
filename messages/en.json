@@ -20,6 +20,16 @@
   "common": {
     "switchLang": "FR"
   },
+  "dashboard": {
+    "greeting": "Hello, {name}!",
+    "rsvp": {
+      "title": "Your RSVP",
+      "pending": "Awaiting your response",
+      "confirmed": "Attendance confirmed",
+      "declined": "Attendance declined",
+      "cta": "Confirm attendance →"
+    }
+  },
   "invitation": {
     "enter": "Enter",
     "saveTheDate": {

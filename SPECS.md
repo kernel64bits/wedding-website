@@ -161,6 +161,8 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Adding new npm packages: add to `package.json`, delete `package-lock.json`, then `docker compose down -v && docker compose up --build` (the `-v` drops the stale `node_modules` volume)
 - Adding new shadcn/ui components: `docker compose exec app npx shadcn@latest add <component>` — writes into `components/ui/` via bind mount, then commit the file
 
+> ⚠️ **Never run `npm install` on the host machine.** All package installation happens inside the Docker container. The `node_modules` directory lives in a named Docker volume, not on the host filesystem.
+
 **Key files created:**
 | File | Purpose |
 |------|---------|
@@ -201,7 +203,7 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [x] Post-ticket check: refactor opportunities identified and addressed
 - [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T1.3 — Design tokens & visual identity
+#### T1.3 — Design tokens & visual identity ✅
 **Description:** Define the visual language of the site — palette, typography, Tailwind theme extension, shadcn theme override. All subsequent UI tickets consume these tokens; none redefine them.
 **Acceptance criteria:**
 - Color palette defined and documented: primary accent, background gradient, text colors, surface colors — inspired by the prototype (`#8b6f47` warm brown, `#fdfcfb → #e2d1c3` cream/beige)
@@ -209,12 +211,12 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Tailwind CSS theme extended in `globals.css` with custom color and font tokens
 - shadcn/ui CSS variables (oklch) remapped to match the palette (buttons, cards, inputs match the wedding aesthetic, not default shadcn neutrals)
 - A `/dev/styles` page (dev-only, not linked in nav) renders: color swatches, typography scale (h1→p), all button variants, card, input, badge — living reference for all subsequent tickets
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T1.4 — Route groups & base layouts
+#### T1.4 — Route groups & base layouts ✅
 **Description:** Establish the full route group structure and each group's layout shell. No real content — placeholder pages only.
 **Acceptance criteria:**
 - Route groups created: `(gate)`, `(immersive)`, `(dashboard)` under `app/[locale]/`, and `admin/` at root
@@ -225,28 +227,28 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - Placeholder `page.tsx` exists for every route listed in the Route Architecture section
 - Navigating between dashboard pages works; navbar highlights the active route
 - Auth protection is **not** implemented yet (that's T2.3) — all pages are accessible for now
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 ---
 
 ### Epic 2 — Authentication & Entry
 
-#### T2.1 — Gate page
+#### T2.1 — Gate page ✅
 **Description:** The only public-facing page. Shown to any unauthenticated user regardless of the route they tried to reach.
 **Acceptance criteria:**
 - Clean, on-brand page (uses T1.3 tokens) with a message asking the guest to scan their QR code
 - "Request my link" section: a form with email OR phone field — looks up the matching invitation and sends the token link (email via a simple transactional service, SMS via a provider like Twilio or just logged to console for now)
 - Fully bilingual
 - Responsive, works well on mobile (primary use case — guests will land here on their phones)
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T2.2 — Token login & session
+#### T2.2 — Token login & session ✅
 **Description:** API route that validates a guest token, creates a session, and routes the guest to the right page.
 **Acceptance criteria:**
 - `GET /api/login?token=<token>` validates token against DB
@@ -258,12 +260,12 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - If invalid or expired: redirect to gate page with an error query param (`?error=invalid`)
 - Session duration: 30 days
 - Logout: `POST /api/logout` clears the cookie, redirects to gate page
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T2.3 — Auth middleware
+#### T2.3 — Auth middleware ✅
 **Description:** Protect all guest and admin routes behind their respective authentication.
 **Acceptance criteria:**
 - Middleware runs on all `/{locale}/(immersive)/*` and `/{locale}/(dashboard)/*` routes
@@ -272,22 +274,22 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - No valid admin session cookie → redirect to `/admin/login`
 - Session validation checks expiry timestamp
 - Guest and admin cookies are fully independent (different names, different payloads)
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T2.4 — QR code generation utility
+#### T2.4 — QR code generation utility ✅
 **Description:** Utility to generate QR codes from guest tokens.
 **Acceptance criteria:**
 - `lib/qrcode.ts`: function that takes a token + base URL, returns a QR code as SVG string or PNG Buffer
 - QR code encodes: `https://<base_url>/api/login?token=<token>`
 - Used by admin panel (T5.3, T5.4) — not exposed as a standalone page
 - Uses `qrcode` npm package
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 #### T2.5 — Request link by email/SMS (optional)
 **Description:** Let guests without their QR code request their personal link via email or SMS.
@@ -307,7 +309,7 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 
 ### Epic 3 — Invitation Experience
 
-#### T3.1 — Cinematic invitation page
+#### T3.1 — Cinematic invitation page ✅
 **Description:** The emotional heart of the site. A full-viewport, scroll-driven experience guests see on first login — a direct Next.js port of the HTML prototype, bilingual, using T1.3 design tokens.
 **Acceptance criteria:**
 - Full-viewport layout (no navbar, no footer — `(immersive)` route group)
@@ -320,27 +322,27 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - "Go to my space →" CTA button at the end leads to `/{locale}/home`
 - Accessible again from the dashboard ("Replay invitation" link)
 - Fully responsive, mobile-first
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 ---
 
 ### Epic 4 — Guest Dashboard
 
-#### T4.1 — Dashboard home
+#### T4.1 — Dashboard home ✅
 **Description:** Hub page guests land on after their first visit. Personalized, warm, functional.
 **Acceptance criteria:**
 - Personalized greeting: "Bonjour, [prénom] !" using the primary attendee name
 - RSVP status summary card: confirmed / pending / declined with a CTA if pending
-- Quick-access links to all dashboard sections (Info, RSVP, Seating, Gallery)
-- "Replay invitation" button → `/{locale}/invitation`
+- ~~Quick-access links to all dashboard sections (Info, RSVP, Seating, Gallery)~~ — removed, redundant with navbar
+- ~~"Replay invitation" button → `/{locale}/invitation`~~ — removed, redundant with navbar
 - Displayed in guest's language (from `invitation.language`)
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 #### T4.2 — RSVP form
 **Description:** Form for guests to confirm attendance and provide details per attendee.

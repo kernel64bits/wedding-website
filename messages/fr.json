@@ -20,6 +20,16 @@
   "common": {
     "switchLang": "EN"
   },
+  "dashboard": {
+    "greeting": "Bonjour, {name}\u00a0!",
+    "rsvp": {
+      "title": "Votre RSVP",
+      "pending": "En attente de votre réponse",
+      "confirmed": "Présence confirmée",
+      "declined": "Absence confirmée",
+      "cta": "Confirmer ma présence →"
+    }
+  },
   "invitation": {
     "enter": "Entrer",
     "saveTheDate": {
