@@ -52,6 +52,12 @@ docker compose exec app node prisma/seed.mjs
 ```
 Creates a test invitation with token `test-token-123`. Never run in production.
 
+**Log in as a guest**
+```
+http://localhost:3000/api/login?token=<token>
+```
+Validates the token, sets the session cookie, and redirects to `/invitation` (first visit) or `/home` (returning visit). Use `test-token-123` after seeding.
+
 ---
 
 ## Project structure
