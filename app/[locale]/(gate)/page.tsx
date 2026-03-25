@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { QrCode } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { getGuestSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
 export default async function GatePage({
   params,
@@ -12,6 +14,8 @@ export default async function GatePage({
   const { locale } = await params;
   const { error } = await searchParams;
   setRequestLocale(locale);
+  const session = await getGuestSession();
+  if (session) redirect(`/${locale}/home`);
   const t = await getTranslations("gate");
 
   return (
