@@ -145,6 +145,7 @@ Ticket details are split by epic:
 | Epic 5 — Admin Panel | [docs/epic-5-admin.md](docs/epic-5-admin.md) |
 | Epic 6 — Table Assignment (Bonus) | [docs/epic-6-tables.md](docs/epic-6-tables.md) |
 | Epic 7 — Production Readiness | [docs/epic-7-production.md](docs/epic-7-production.md) |
+| Epic 8 — QA & Testing | [docs/epic-8-qa.md](docs/epic-8-qa.md) |
 
 ---
 

@@ -33,6 +33,10 @@
 | T7.0.c | Photo storage setup | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
 | T7.0.d | Email provider integration | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
 | T7.1 | Harden and ship | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
+| T8.1 | Test infrastructure setup (Vitest + Playwright) | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
+| T8.2 | Unit tests: session & auth utilities | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
+| T8.3 | E2E tests: guest flows | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
+| T8.4 | E2E tests: admin flows | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
 
 ## Legend
 | Symbol | Meaning |
