@@ -52,6 +52,7 @@ model Table {
 }
 
 model Settings {
-  id         String  @id @default("singleton")
-  rsvpLocked Boolean @default(false)
+  id             String  @id @default("singleton")
+  rsvpLocked     Boolean @default(false)
+  seatingEnabled Boolean @default(false)
 }

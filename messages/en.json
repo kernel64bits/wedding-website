@@ -58,6 +58,12 @@
       "locked": "Responses are now closed."
     }
   },
+  "seating": {
+    "title": "Seating plan",
+    "yourTable": "You are seated at table {number}",
+    "pending": "The seating plan is not yet available.",
+    "noTable": "Your table assignment is not confirmed yet."
+  },
   "info": {
     "title": "Practical Information",
     "schedule": {

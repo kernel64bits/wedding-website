@@ -58,6 +58,12 @@
       "locked": "Les réponses sont fermées."
     }
   },
+  "seating": {
+    "title": "Plan de table",
+    "yourTable": "Vous êtes à la table {number}",
+    "pending": "Le plan de table n'est pas encore disponible.",
+    "noTable": "Votre placement n'est pas encore confirmé."
+  },
   "info": {
     "title": "Informations pratiques",
     "schedule": {
