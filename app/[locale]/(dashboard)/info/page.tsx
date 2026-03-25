@@ -18,12 +18,12 @@ export default async function InfoPage({
     getTranslations("invitation"),
   ]);
 
-  const scheduleItems = [
-    { time: t("schedule.item1.time"), title: t("schedule.item1.title"), location: t("schedule.item1.location"), icon: t("schedule.item1.icon") },
-    { time: t("schedule.item2.time"), title: t("schedule.item2.title"), location: t("schedule.item2.location"), icon: t("schedule.item2.icon") },
-    { time: t("schedule.item3.time"), title: t("schedule.item3.title"), location: t("schedule.item3.location"), icon: t("schedule.item3.icon") },
-    { time: t("schedule.item4.time"), title: t("schedule.item4.title"), location: t("schedule.item4.location"), icon: t("schedule.item4.icon") },
-  ];
+  const scheduleItems = [1, 2, 3, 4].map((n) => ({
+    time: t(`schedule.item${n}.time`),
+    title: t(`schedule.item${n}.title`),
+    location: t(`schedule.item${n}.location`),
+    icon: t(`schedule.item${n}.icon`),
+  }));
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12 space-y-6">
@@ -36,8 +36,8 @@ export default async function InfoPage({
         </CardHeader>
         <CardContent>
           <ol className="relative border-l border-border space-y-6 ml-2">
-            {scheduleItems.map((item, i) => (
-              <li key={i} className="pl-6 relative">
+            {scheduleItems.map((item) => (
+              <li key={item.title} className="pl-6 relative">
                 <span className="absolute -left-5 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-background border border-border text-xl">
                   {item.icon}
                 </span>
