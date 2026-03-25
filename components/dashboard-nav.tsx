@@ -58,16 +58,16 @@ export function DashboardNav() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64">
+            <SheetContent side="right" className="w-4/5">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
-              <div className="mt-8 flex flex-col gap-6">
+              <div className="mt-8 flex flex-col items-center gap-6 text-center">
                 <p className="font-serif text-lg font-light">Sophie & John</p>
                 {links.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "text-sm transition-colors",
+                      "text-base transition-colors",
                       link.italic && "italic",
                       pathname.endsWith(link.href)
                         ? "font-medium text-primary"
