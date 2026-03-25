@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/lib/navigation";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -59,6 +59,7 @@ export function DashboardNav() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-64">
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
               <div className="mt-8 flex flex-col gap-6">
                 <p className="font-serif text-lg font-light">Sophie & John</p>
                 {links.map((link) => (

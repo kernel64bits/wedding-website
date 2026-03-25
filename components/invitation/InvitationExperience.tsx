@@ -297,12 +297,6 @@ function CelebrationSection() {
         >
           {t("celebration.body")}
         </motion.p>
-        <motion.p
-          variants={fadeUp}
-          className="mt-4 font-serif text-sm italic text-[oklch(0.52_0.082_55.7)]/70"
-        >
-          {t("celebration.dresscode")}
-        </motion.p>
       </div>
     </SectionContent>
   );

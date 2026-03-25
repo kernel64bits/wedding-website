@@ -4,7 +4,7 @@
 
 A bilingual (FR/EN) wedding website. Everything is private — unauthenticated users see only a gate page asking them to scan their QR code.
 
-- **Gate**: single public page — "scan your QR code" message + form to receive the link by email or SMS.
+- **Gate**: single public page — "scan your QR code" message + form to receive the link by email.
 - **Invitation experience**: cinematic, scroll-driven first-login experience (immersive, full-viewport, no navbar).
 - **Guest dashboard**: traditional layout with navbar — RSVP, practical info, seating map, gallery. Guests can replay the invitation from here.
 - **Admin panel**: separate section of the same app (outside locale routes), password-protected, for the couple to manage guests, RSVPs, tables and QR codes.
@@ -34,7 +34,7 @@ A bilingual (FR/EN) wedding website. Everything is private — unauthenticated u
 app/
 ├── [locale]/
 │   ├── (gate)/
-│   │   └── page.tsx              ← public: "scan your QR code" + request link by email/SMS
+│   │   └── page.tsx              ← public: "scan your QR code" + request link by email
 │   ├── (immersive)/
 │   │   └── invitation/
 │   │       └── page.tsx          ← cinematic first-login experience (auth required)
@@ -42,7 +42,7 @@ app/
 │       ├── layout.tsx            ← shared navbar + footer (auth required)
 │       ├── home/page.tsx         ← hub: greeting, RSVP status, quick links
 │       ├── rsvp/page.tsx
-│       ├── info/page.tsx         ← schedule, venue, dress code, accommodation
+│       ├── info/page.tsx         ← schedule, venue, transport
 │       ├── seating/page.tsx
 │       └── gallery/page.tsx
 └── admin/                        ← outside locale (no i18n needed)
@@ -80,7 +80,6 @@ Invitation {
   token               String    @unique
   groupLabel          String                        // e.g. "Famille Dupont"
   email               String?
-  phone               String?                       // for SMS link delivery
   language            String    @default("fr")      // "fr" | "en"
   allowPlusOne        Boolean   @default(false)
   rsvpStatus          String    @default("pending") // pending | confirmed | declined
@@ -240,7 +239,7 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 **Description:** The only public-facing page. Shown to any unauthenticated user regardless of the route they tried to reach.
 **Acceptance criteria:**
 - Clean, on-brand page (uses T1.3 tokens) with a message asking the guest to scan their QR code
-- "Request my link" section: a form with email OR phone field — looks up the matching invitation and sends the token link (email via a simple transactional service, SMS via a provider like Twilio or just logged to console for now)
+- "Request my link" section: a form with email field — looks up the matching invitation and sends the token link (email via a simple transactional service, logged to console until a provider is wired up)
 - Fully bilingual
 - Responsive, works well on mobile (primary use case — guests will land here on their phones)
 - [x] Post-ticket check: acceptance criteria verified (functional test)
@@ -291,14 +290,13 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [x] Post-ticket check: refactor opportunities identified and addressed
 - [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T2.5 — Request link by email/SMS (optional)
-**Description:** Let guests without their QR code request their personal link via email or SMS.
+#### T2.5 — Request link by email (optional)
+**Description:** Let guests without their QR code request their personal link via email.
 **Acceptance criteria:**
 - Gate page gains a "Don't have your QR code?" collapsible section
-- Form with a single field: email or phone number
-- `POST /api/request-link` looks up invitation by email or phone, sends the token link
-- Email via a transactional provider (Resend, Postmark…); SMS via Twilio or similar — logged to console until a provider is wired up
-- Requires adding `phone: String?` to the `Invitation` schema
+- Form with a single field: email address
+- `POST /api/request-link` looks up invitation by email, sends the token link
+- Email via a transactional provider (Resend, Postmark…) — logged to console until a provider is wired up
 - Fully bilingual
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed
@@ -369,20 +367,17 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 - [x] Post-ticket check: refactor opportunities identified and addressed
 - [x] Post-ticket check: directory layout is clean and well-organized
 
-#### T4.3 — Practical info page
+#### T4.3 — Practical info page ✅
 **Description:** Everything guests need to know — schedule, venue, logistics. All content comes from translation files.
 **Acceptance criteria:**
 - Wedding day timeline / schedule section (vertical timeline component — time, title, location, icon)
 - Venue section: address, embedded map (Leaflet iframe or static map)
 - Transport & parking section
-- Accommodation suggestions (name, link, approximate price range)
-- Dress code section
-- Contact section (email or phone for questions)
 - All text bilingual, content defined in `messages/fr.json` and `messages/en.json`
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 #### T4.4 — Seating map
 **Description:** Visual map of the room showing table assignments.
@@ -445,10 +440,10 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 **Description:** View and edit an individual invitation record.
 **Acceptance criteria:**
 - Accessible from guest list: click a row → `/admin/guests/[id]`
-- Shows all invitation fields: group label, email, phone, language, allowPlusOne, RSVP status, table, last login, invitationViewedAt, token
+- Shows all invitation fields: group label, email, language, allowPlusOne, RSVP status, table, last login, invitationViewedAt, token
 - Lists all attendees with attending status and dietary info
 - QR code preview (uses T2.4 utility)
-- Admin can edit: group label, email, phone, language, allowPlusOne, table number
+- Admin can edit: group label, email, language, allowPlusOne, table number
 - Admin can add/remove/edit attendees and manually override RSVP status and dietary details
 - Save → `PATCH /api/admin/invitations/[id]`
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
@@ -516,6 +511,40 @@ All scaffolding runs inside Docker. Config files are written on the host; heavy 
 
 ### Epic 7 — Production Readiness
 
+#### T7.0 — Infrastructure & hosting design *(design ticket — outcome is implementation sub-tickets)*
+
+**Description:** Decide on the full hosting stack before implementation begins. This ticket has no code output — its deliverable is a set of concrete decisions documented here, and the creation of the resulting implementation tickets (T7.0.a through T7.0.x). Nothing in Epic 7 should be implemented before this ticket is resolved.
+
+**Questions to answer:**
+
+| Concern | Options | Decision |
+|---------|---------|----------|
+| **App hosting** | Vercel (zero-config Next.js), Railway (container, simple), Fly.io (container, more control) | TBD |
+| **Database** | Keep SQLite on a persistent volume, or migrate to PostgreSQL (managed: Supabase, Railway, Neon) | TBD |
+| **Photo/media storage** | Cloudinary (free tier, transform API), Cloudflare Images, S3/R2, self-hosted in `/public` | TBD |
+| **CDN access control** | Public URLs (rely on obscurity + app auth), or signed URLs generated server-side | TBD |
+| **Email provider** | Resend (simple API, generous free tier), Postmark, AWS SES | TBD |
+| **Secrets management** | Platform env vars (Vercel / Railway dashboard), or external vault | TBD |
+| **Public git repo** | What goes in git vs. stays out (photos, `.env`, `dev.db`) | Keep photos on CDN, secrets in env vars, DB file gitignored — safe to make repo public |
+
+**Constraints to factor in:**
+- Site is private-only (all routes auth-gated) — no SEO, no CDN edge caching needed for pages
+- ~50–200 guests, low traffic — no need to over-engineer scale
+- SQLite is fine for this load; PostgreSQL only if the chosen host makes it cheaper/easier than managing a persistent volume
+- Photos should never be committed to git regardless of repo visibility
+- `dev.db` and `.env` are already gitignored — repo is safe to make public once photo storage is resolved
+
+**Acceptance criteria:**
+- All decisions in the table above are filled in
+- The following implementation tickets exist and are scoped (add them to this file):
+  - T7.0.a — App deployment setup (CI/CD, environment variables, domain)
+  - T7.0.b — Database migration for production (if switching from SQLite)
+  - T7.0.c — Photo storage setup (CDN account, upload workflow, replace Unsplash placeholders)
+  - T7.0.d — Email provider integration (replace `console.log` stub in `POST /api/request-link`)
+- [ ] Post-ticket check: all decisions documented, implementation tickets created
+
+---
+
 #### T7.1 — Harden and ship
 
 **Description:** Final pass before going live. Remove all dev tooling from the production build, add security headers, and run a basic pentest checklist. Nothing should be shipped without this ticket done.
@@ -559,7 +588,7 @@ No npm package needed — use a simple in-memory sliding window (sufficient for 
 | Endpoint | Limit | Why |
 |----------|-------|-----|
 | `GET /api/login` | 10 req / 15 min per IP | Token brute-force |
-| `POST /api/request-link` | 3 req / hour per IP | Email/SMS abuse |
+| `POST /api/request-link` | 3 req / hour per IP | Email abuse |
 | `POST /api/logout` | 10 req / min per IP | Low risk, just sanity |
 | `POST /api/rsvp` | 20 req / min per IP | Spam prevention |
 | `POST /admin/login` | 5 req / 15 min per IP | Password brute-force |
@@ -619,6 +648,46 @@ Run through these before go-live:
 
 ---
 
+**7.1.f — Prisma schema hardening**
+
+| Item | What to do |
+|------|-----------|
+| Missing cascade rules | Add `onDelete: Cascade` on `Attendee → Invitation` relation so deleting an invitation cleans up its attendees. Add `onDelete: SetNull` for `Invitation.tableNumber` → `Table` if/when a foreign key is introduced, so deleting a table doesn't orphan invitations |
+| Missing database indexes | Add `@@index([email])` on `Invitation` for email lookups (used by request-link). Add `@@index([token])` if Prisma doesn't already optimize the `@unique` constraint for lookups |
+| No `Settings` singleton guard | Ensure the seed script creates the `Settings` singleton row; document that exactly one row must exist |
+
+---
+
+**7.1.g — Next.js config hardening**
+
+| Item | What to do |
+|------|-----------|
+| `poweredByHeader` | Set `poweredByHeader: false` in `next.config.ts` to suppress the `X-Powered-By: Next.js` header |
+| Remote image domains | Audit `images.remotePatterns` — remove `unsplash.com` / `pexels.com` if not used in production; add only the domains actually needed |
+
+---
+
+**7.1.h — Docker production readiness**
+
+| Item | What to do |
+|------|-----------|
+| Single-stage Dockerfile | Add a multi-stage build: `deps` stage for `npm ci --omit=dev`, `builder` stage for `next build`, `runner` stage with only production artifacts — reduces final image size and removes dev tooling |
+| Dev command in CMD | Change `CMD ["npm", "run", "dev"]` to `CMD ["node", "server.js"]` (or `next start`) in production; use `docker-compose.override.yml` for dev |
+| Prisma Studio port | Port 5555 is exposed in `docker-compose.yml` — remove from production compose or move to a `docker-compose.dev.yml` override |
+
+---
+
+**7.1.i — Miscellaneous production issues**
+
+| Item | What to do |
+|------|-----------|
+| Hardcoded couple names | Replace "Sophie & John" and "Juin 2026" in `app/[locale]/(dashboard)/layout.tsx` footer with translation keys from `messages/{locale}.json` |
+| Non-functional admin logout | `app/admin/layout.tsx` has `<a href="#">Logout</a>` — wire it to `POST /api/logout` (admin variant) |
+| Hardcoded confetti colors | `components/invitation/Confetti.tsx` uses hardcoded hex colors — derive from the active theme tokens or make configurable via `lib/theme.config.ts` |
+| Dev route `/[locale]/dev/confetti` | Not listed in 7.1.a — also gate or remove this route alongside `/dev/styles` |
+
+---
+
 **Acceptance criteria:**
 - Dev indicator and styles page are gone in production build
 - All security headers present and verified via securityheaders.com
@@ -656,6 +725,14 @@ T1.1 ──► T1.2 ──► T1.3 ──► T1.4
                 (all of the above)
                               │
                               ▼
+                            T7.0 (design: hosting decisions)
+                              │
+                    ┌─────────┼──────────┐
+                    ▼         ▼          ▼
+                 T7.0.a   T7.0.b     T7.0.c
+                 T7.0.d
+                    └─────────┼──────────┘
+                              ▼
                             T7.1
 ```
 
@@ -666,4 +743,6 @@ T1.1 ──► T1.2 ──► T1.3 ──► T1.4
 4. **T4.1 → T4.2 → T4.3 → T4.4 → T4.5** — guest dashboard
 5. **T5.1 → T5.2 → T5.3 → T5.4** — admin panel
 6. **T6.1 → T6.2** — bonus: drag-and-drop table assignment
-7. **T7.1** — production hardening (always last, before go-live)
+7. **T7.0** — infrastructure design decisions (gates all T7 implementation)
+8. **T7.0.a–d** — deploy, DB, photos, email (from T7.0 decisions)
+9. **T7.1** — production hardening (always last, before go-live)

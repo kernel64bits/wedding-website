@@ -58,6 +58,26 @@
       "locked": "Responses are now closed."
     }
   },
+  "info": {
+    "title": "Practical Information",
+    "schedule": {
+      "title": "Schedule",
+      "item1": { "time": "3:00 PM", "title": "Ceremony", "location": "Garden of Domaine des Roses", "icon": "💐" },
+      "item2": { "time": "4:30 PM", "title": "Cocktail hour", "location": "Terrace", "icon": "🥂" },
+      "item3": { "time": "7:30 PM", "title": "Dinner", "location": "Main hall", "icon": "🍽️" },
+      "item4": { "time": "11:00 PM", "title": "Dancing", "location": "Main hall", "icon": "🎶" }
+    },
+    "venue": {
+      "title": "Venue",
+      "addressLabel": "Address",
+      "mapLabel": "Getting there"
+    },
+    "transport": {
+      "title": "Getting there & parking",
+      "car": "By car: free on-site parking (100 spaces).",
+      "transit": "By public transit: RER A to Vincennes, then taxi (10 min)."
+    }
+  },
   "invitation": {
     "enter": "Enter",
     "saveTheDate": {
@@ -84,8 +104,7 @@
     },
     "celebration": {
       "heading": "The celebration",
-      "body": "An evening of dinner, dancing, and joy awaits. We have planned every detail so you can simply be present with us.",
-      "dresscode": "Dress code: garden elegance"
+      "body": "An evening of dinner, dancing, and joy awaits. We have planned every detail so you can simply be present with us."
     },
     "closing": {
       "heading": "See you soon",

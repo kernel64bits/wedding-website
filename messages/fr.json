@@ -58,6 +58,26 @@
       "locked": "Les réponses sont fermées."
     }
   },
+  "info": {
+    "title": "Informations pratiques",
+    "schedule": {
+      "title": "Programme",
+      "item1": { "time": "15h00", "title": "Cérémonie", "location": "Jardin du Domaine des Roses", "icon": "💐" },
+      "item2": { "time": "16h30", "title": "Vin d'honneur", "location": "Terrasse", "icon": "🥂" },
+      "item3": { "time": "19h30", "title": "Dîner", "location": "Grande salle", "icon": "🍽️" },
+      "item4": { "time": "23h00", "title": "Soirée dansante", "location": "Grande salle", "icon": "🎶" }
+    },
+    "venue": {
+      "title": "Lieu",
+      "addressLabel": "Adresse",
+      "mapLabel": "Accès"
+    },
+    "transport": {
+      "title": "Accès & stationnement",
+      "car": "En voiture\u00a0: parking gratuit sur place (100 places).",
+      "transit": "En transports\u00a0: RER A jusqu'à Vincennes, puis taxi (10 min)."
+    }
+  },
   "invitation": {
     "enter": "Entrer",
     "saveTheDate": {
@@ -84,8 +104,7 @@
     },
     "celebration": {
       "heading": "La fête",
-      "body": "Une soirée de dîner, de danse et de joie vous attend. Nous avons pensé à chaque détail pour que vous puissiez simplement profiter de ce moment.",
-      "dresscode": "Code vestimentaire\u00a0: élégance jardin"
+      "body": "Une soirée de dîner, de danse et de joie vous attend. Nous avons pensé à chaque détail pour que vous puissiez simplement profiter de ce moment."
     },
     "closing": {
       "heading": "À très bientôt",
