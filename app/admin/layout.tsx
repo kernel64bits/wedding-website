@@ -37,12 +37,14 @@ export default function AdminLayout({
               Tables
             </Link>
             <div className="ml-auto">
-              <a
-                href="#"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Logout
-              </a>
+              <form method="POST" action="/api/admin/logout">
+                <button
+                  type="submit"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Logout
+                </button>
+              </form>
             </div>
           </nav>
           <main className="flex-1 p-8">{children}</main>
