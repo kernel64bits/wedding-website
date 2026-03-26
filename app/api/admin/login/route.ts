@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { createAdminSessionValue, ADMIN_COOKIE } from "@/lib/session";
+import { createAdminSessionValue, ADMIN_COOKIE, ADMIN_SESSION_DURATION_MS } from "@/lib/session";
 import { requestOrigin } from "@/lib/request";
-
-const ADMIN_SESSION_MAX_AGE_S = 8 * 60 * 60;
 
 export async function POST(request: NextRequest) {
   const origin = requestOrigin(request);
@@ -28,7 +26,7 @@ export async function POST(request: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: ADMIN_SESSION_MAX_AGE_S,
+    maxAge: ADMIN_SESSION_DURATION_MS / 1000,
     path: "/",
   });
   return response;

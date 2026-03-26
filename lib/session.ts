@@ -14,7 +14,7 @@ export interface GuestSession {
 // ── Admin session ─────────────────────────────────────────────────────────────
 
 export const ADMIN_COOKIE = "wedding_admin_session";
-const ADMIN_SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
+export const ADMIN_SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
 
 export interface AdminSession {
   adminId: string;
