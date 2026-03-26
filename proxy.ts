@@ -10,46 +10,67 @@ import {
 
 const intlMiddleware = createMiddleware(routing);
 
+// Explicit allowlist of guest-accessible sub-routes under /{locale}/.
+// Adding a new page requires a conscious entry here — secure by default.
+const GUEST_ROUTES = new Set([
+  "home",
+  "invitation",
+  "gallery",
+  "info",
+  "rsvp",
+  "seating",
+]);
+
 export default function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
 
-  // ── Admin routes ────────────────────────────────────────────────────────────
+  // ── 1 & 2. Admin routes ───────────────────────────────────────────────────
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") return NextResponse.next();
-
     const raw = request.cookies.get(ADMIN_COOKIE)?.value;
-    if (!raw || !verifyAdminToken(raw)) {
+    if (!raw || !verifyAdminToken(raw))
       return NextResponse.redirect(new URL("/admin/login", request.url));
-    }
-
     return NextResponse.next();
   }
 
-  // ── Protected guest routes ──────────────────────────────────────────────────
-  // The gate page lives at /{locale} (segments.length === 1) and is public.
-  // Everything deeper (/{locale}/home, /{locale}/invitation, …) requires a
-  // valid guest session.
+  // Parse locale prefix
   const segments = pathname.split("/").filter(Boolean); // e.g. ["fr", "home"]
   const locale = segments[0];
+  const sub = segments[1]; // "home" | "dev" | undefined
   const isKnownLocale = routing.locales.includes(
     locale as (typeof routing.locales)[number]
   );
-  const isProtectedGuestRoute = isKnownLocale && segments.length > 1;
 
-  if (isProtectedGuestRoute) {
-    const raw = request.cookies.get(GUEST_COOKIE)?.value;
-    if (!raw || !verifyGuestToken(raw)) {
+  // ── 3. Dev routes — guest session required; hidden in production ──────────
+  if (isKnownLocale && sub === "dev") {
+    if (process.env.NODE_ENV === "production")
       return NextResponse.redirect(new URL(`/${locale}`, request.url));
-    }
+    const raw = request.cookies.get(GUEST_COOKIE)?.value;
+    if (!raw || !verifyGuestToken(raw))
+      return NextResponse.redirect(new URL(`/${locale}`, request.url));
+    return intlMiddleware(request) as NextResponse;
   }
 
-  // ── i18n routing (locale prefix, redirects, …) ─────────────────────────────
-  return intlMiddleware(request) as NextResponse;
+  // ── 4. Gate page — public ─────────────────────────────────────────────────
+  if (isKnownLocale && !sub) {
+    return intlMiddleware(request) as NextResponse;
+  }
+
+  // ── 5. Guest routes — explicit allowlist ─────────────────────────────────
+  if (isKnownLocale && sub && GUEST_ROUTES.has(sub)) {
+    const raw = request.cookies.get(GUEST_COOKIE)?.value;
+    if (!raw || !verifyGuestToken(raw))
+      return NextResponse.redirect(new URL(`/${locale}`, request.url));
+    return intlMiddleware(request) as NextResponse;
+  }
+
+  // ── 6. Default deny ───────────────────────────────────────────────────────
+  const fallback = isKnownLocale ? locale : routing.defaultLocale;
+  return NextResponse.redirect(new URL(`/${fallback}`, request.url));
 }
 
 export const config = {
-  // Run on locale routes and admin routes; skip Next.js internals, API, and static files
-  matcher: [
-    "/((?!_next|_vercel|api|.*\\..*).*)",
-  ],
+  // Run on all paths except Next.js internals, Vercel internals, API routes,
+  // and static files (anything with a file extension).
+  matcher: ["/((?!_next|_vercel|api|.*\\..*).*)",],
 };
