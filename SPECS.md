@@ -46,12 +46,14 @@ app/
 │       ├── seating/page.tsx
 │       └── gallery/page.tsx
 └── admin/                        ← outside locale (no i18n needed)
-    ├── layout.tsx                ← admin shell (admin auth required)
-    ├── login/page.tsx
-    ├── guests/
-    │   ├── page.tsx              ← guest list + summary stats
-    │   └── [id]/page.tsx         ← guest detail + manual override
-    └── tables/page.tsx           ← table management
+    ├── layout.tsx                ← admin shell: html/body/nav (no auth check)
+    ├── login/page.tsx            ← public
+    └── (protected)/              ← route group: getAdminSession() gate
+        ├── layout.tsx            ← redirects to /admin/login if no admin session
+        ├── guests/
+        │   ├── page.tsx          ← guest list + summary stats
+        │   └── [id]/page.tsx     ← guest detail + manual override
+        └── tables/page.tsx       ← table management
 ```
 
 **Route groups** (`(gate)`, `(immersive)`, `(dashboard)`) are Next.js organizational folders — they don't appear in URLs. Each has its own layout (or none), so the cinematic invitation page and the dashboard never share a navbar.
@@ -70,7 +72,7 @@ app/
 **Admin:**
 - Email + password login at `/admin/login`.
 - Sets a separate admin session cookie (independent from guest cookie).
-- Protected by Next.js middleware on `/admin/*` routes (except `/admin/login`).
+- Double-protected: middleware rejects requests without a valid admin cookie, AND `app/admin/(protected)/layout.tsx` calls `getAdminSession()` server-side and redirects — neither layer depends on the other.
 
 ### Data Model
 

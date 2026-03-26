@@ -1,6 +1,6 @@
 # Ticket Status
 
-> Last updated: 2026-03-25
+> Last updated: 2026-03-26
 
 | Ticket | Title | Status | Epic file |
 |--------|-------|--------|-----------|
@@ -13,7 +13,7 @@
 | T2.3 | Auth middleware | ✅ Done | [epic-2](docs/epic-2-auth.md) |
 | T2.4 | QR code generation utility | ✅ Done | [epic-2](docs/epic-2-auth.md) |
 | T2.5 | Request link by email | ⬜ Optional | [epic-2](docs/epic-2-auth.md) |
-| **T2.6** | **Middleware hardening: explicit allowlist + default deny** | **🔜 Next** | [epic-2](docs/epic-2-auth.md) |
+| T2.6 | Middleware hardening: explicit allowlist + default deny | ✅ Done | [epic-2](docs/epic-2-auth.md) |
 | T3.1 | Cinematic invitation page | ✅ Done | [epic-3](docs/epic-3-invitation.md) |
 | T4.1 | Dashboard home | ✅ Done | [epic-4](docs/epic-4-dashboard.md) |
 | T4.2 | RSVP form | ✅ Done | [epic-4](docs/epic-4-dashboard.md) |

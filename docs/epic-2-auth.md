@@ -78,36 +78,38 @@
 
 ---
 
-#### T2.6 — Middleware hardening: explicit allowlist + default deny
-**Description:** Strengthen `proxy.ts` so that access is denied by default and every accessible route is explicitly declared. Closes two current gaps: dev routes are only guest-protected (not admin-only), and unknown paths fall through to the i18n middleware rather than being rejected.
+#### T2.6 — Middleware hardening: explicit allowlist + default deny ✅
+**Description:** Strengthen `proxy.ts` so that access is denied by default and every accessible route is explicitly declared. All unknown paths are rejected rather than falling through to the i18n middleware.
 
-**Access policy (ordered checks):**
+**Access policy (ordered checks, implemented in `middleware.ts`):**
 
 | Path | Access |
 |------|--------|
 | `/admin/login` | Public |
 | `/admin/*` | Admin session required → redirect `/admin/login` |
-| `/{locale}/dev/*` | Admin session required in production; open in development (see note) |
+| `/{locale}/dev/*` | Guest session required in development; hidden (→ gate) in production |
 | `/{locale}` (gate) | Public |
 | `/{locale}/{guest-route}` | Guest session required → redirect `/{locale}` |
 | Everything else | Redirect to `/{defaultLocale}` (default deny) |
 
-**Guest route allowlist** — explicit `Set` in `proxy.ts`. New guest pages must be consciously added here:
+**Guest route allowlist** — explicit `Set` in `middleware.ts`. New guest pages must be consciously added here:
 ```
 home, invitation, gallery, info, rsvp, seating
 ```
 
-**Dev route guard:** In development (`NODE_ENV !== 'production'`), skip the admin check for `/dev/*` so developers don't need an admin session to view style/debug pages. In production, admin session required.
-
-> **Open question:** bare `/` (root) — currently intlMiddleware redirects it to `/{defaultLocale}`. With default deny, the fallback also redirects to `/{defaultLocale}`. Behaviour is identical; decide whether to keep the implicit intlMiddleware fallback or make it explicit.
+**Defense in depth:**
+- Admin pages additionally protected by `app/admin/(protected)/layout.tsx` which calls `getAdminSession()` and redirects server-side — independent of middleware.
+- Gate page calls `getGuestSession()` and redirects authenticated users to `/{locale}/home`.
 
 **Acceptance criteria:**
-- Guest visiting `/{locale}/dev/*` in production → redirected to `/admin/login`
-- Guest visiting `/{locale}/dev/*` in development → accessible (no auth required)
-- Admin visiting `/{locale}/dev/*` → accessible in both environments
-- Unknown path (e.g. `/{locale}/foo`) → redirected to `/{defaultLocale}` (gate)
-- All existing guest and admin protections remain intact (regression test)
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Unknown path (e.g. `/{locale}/foo`) → redirected to `/{defaultLocale}` (gate)
+- [x] `/{locale}/dev/*` in production → redirected to gate (hidden)
+- [x] `/{locale}/dev/*` in development without session → redirected to gate
+- [x] `/{locale}/dev/*` in development with guest session → accessible
+- [x] All existing guest and admin protections remain intact (regression tested)
+- [x] Authenticated user visiting gate page → redirected to `/{locale}/home`
+- [x] Admin pages call `getAdminSession()` in layout (defense in depth)
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
