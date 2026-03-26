@@ -1,8 +1,89 @@
-export default function AdminGuestsPage() {
+import { prisma } from "@/lib/prisma";
+import { Users } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { GuestListClient } from "@/components/admin/guest-list-client";
+
+function StatCard({
+  label,
+  value,
+  colorClass,
+}: {
+  label: string;
+  value: number;
+  colorClass?: string;
+}) {
   return (
-    <div className="space-y-2">
-      <h1 className="text-3xl font-semibold">Guests</h1>
-      <p className="text-muted-foreground">Coming in T5.2</p>
+    <Card>
+      <CardContent className="pt-4 pb-4">
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+        <p className={`mt-1 text-3xl font-semibold ${colorClass ?? ""}`}>
+          {value}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default async function AdminGuestsPage() {
+  const invitations = await prisma.invitation.findMany({
+    include: { attendees: { orderBy: { isPrimary: "desc" } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const attending = invitations
+    .flatMap((i) => i.attendees)
+    .filter((a) => a.attending === true).length;
+
+  const stats = {
+    total: invitations.length,
+    confirmed: invitations.filter((i) => i.rsvpStatus === "confirmed").length,
+    declined: invitations.filter((i) => i.rsvpStatus === "declined").length,
+    pending: invitations.filter((i) => i.rsvpStatus === "pending").length,
+    attending,
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Users className="h-5 w-5 text-muted-foreground" />
+          <h1 className="text-2xl font-semibold">Guests</h1>
+        </div>
+        <a href="/api/admin/guests/export">
+          <Button variant="outline" size="sm">
+            Export CSV
+          </Button>
+        </a>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <StatCard label="Total" value={stats.total} />
+        <StatCard
+          label="Confirmed"
+          value={stats.confirmed}
+          colorClass="text-green-600"
+        />
+        <StatCard
+          label="Declined"
+          value={stats.declined}
+          colorClass="text-destructive"
+        />
+        <StatCard
+          label="Pending"
+          value={stats.pending}
+          colorClass="text-muted-foreground"
+        />
+        <StatCard
+          label="Attending"
+          value={stats.attending}
+          colorClass="text-primary"
+        />
+      </div>
+
+      <GuestListClient invitations={invitations} />
     </div>
   );
 }
