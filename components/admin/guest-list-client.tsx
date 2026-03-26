@@ -15,6 +15,9 @@ import {
 
 type InvitationWithAttendees = Invitation & { attendees: Attendee[] };
 
+const selectClassName =
+  "rounded-md border border-input bg-background px-3 py-1.5 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring";
+
 function statusBadge(status: string) {
   const base = "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium";
   if (status === "confirmed")
@@ -70,7 +73,7 @@ export function GuestListClient({
         <select
           value={rsvpFilter}
           onChange={(e) => setRsvpFilter(e.target.value)}
-          className="rounded-md border border-input bg-background px-3 py-1.5 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          className={selectClassName}
         >
           <option value="all">All statuses</option>
           <option value="pending">Pending</option>
@@ -80,7 +83,7 @@ export function GuestListClient({
         <select
           value={tableFilter}
           onChange={(e) => setTableFilter(e.target.value)}
-          className="rounded-md border border-input bg-background px-3 py-1.5 text-sm text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          className={selectClassName}
         >
           <option value="all">All tables</option>
           <option value="assigned">Assigned</option>

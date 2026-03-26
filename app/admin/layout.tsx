@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 export default function AdminLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <html lang="fr" className={`${inter.variable} theme-classic`}>

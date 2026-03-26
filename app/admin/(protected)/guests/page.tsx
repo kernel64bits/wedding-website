@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { GuestListClient } from "@/components/admin/guest-list-client";
 
 function StatCard({
@@ -14,12 +13,12 @@ function StatCard({
   colorClass?: string;
 }) {
   return (
-    <Card>
-      <CardContent className="pt-4 pb-4">
+    <Card className="items-center py-0">
+      <CardContent className="flex flex-col items-center py-4 text-center">
         <p className="text-xs uppercase tracking-wide text-muted-foreground">
           {label}
         </p>
-        <p className={`mt-1 text-3xl font-semibold ${colorClass ?? ""}`}>
+        <p className={`mt-2 text-4xl font-semibold ${colorClass ?? ""}`}>
           {value}
         </p>
       </CardContent>
@@ -47,16 +46,9 @@ export default async function AdminGuestsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-2xl font-semibold">Guests</h1>
-        </div>
-        <a href="/api/admin/guests/export">
-          <Button variant="outline" size="sm">
-            Export CSV
-          </Button>
-        </a>
+      <div className="flex items-center gap-2">
+        <Users className="h-5 w-5 text-muted-foreground" />
+        <h1 className="text-2xl font-semibold">Guests</h1>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
