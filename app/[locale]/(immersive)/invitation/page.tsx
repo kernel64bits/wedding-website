@@ -13,7 +13,6 @@ export default async function InvitationPage({
 
   return (
     <InvitationExperience
-      locale={locale}
       invitationId={session?.invitationId ?? null}
     />
   );

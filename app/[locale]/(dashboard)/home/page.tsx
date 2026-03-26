@@ -1,13 +1,13 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { getGuestSession } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getSettings, prisma } from "@/lib/prisma";
 import { Link } from "@/lib/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { DietarySlug, parseDietary } from "@/lib/dietary";
+import { parseDietary, type DietarySlug } from "@/lib/dietary";
 
 export default async function HomePage({
   params,
@@ -25,11 +25,7 @@ export default async function HomePage({
       where: { id: session.invitationId },
       include: { attendees: true },
     }),
-    prisma.settings.upsert({
-      where: { id: "singleton" },
-      create: { id: "singleton" },
-      update: {},
-    }),
+    getSettings(),
   ]);
   if (!invitation) redirect(`/${locale}`);
 
@@ -151,4 +147,3 @@ export default async function HomePage({
     </div>
   );
 }
- 

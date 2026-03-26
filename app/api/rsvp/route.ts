@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getGuestSession } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getSettings, prisma } from "@/lib/prisma";
 
 interface AttendeePayload {
   id: string;
@@ -26,11 +26,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check RSVP lock
-  const settings = await prisma.settings.upsert({
-    where: { id: "singleton" },
-    create: { id: "singleton" },
-    update: {},
-  });
+  const settings = await getSettings();
   if (settings.rsvpLocked === true) {
     return NextResponse.json({ error: "RSVP is locked" }, { status: 423 });
   }
@@ -49,7 +45,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "attendees is required" }, { status: 400 });
   }
 
-  if (plusOne !== null && plusOne !== undefined) {
+  if (plusOne != null) {
     if (typeof plusOne.name !== "string" || plusOne.name.trim() === "") {
       return NextResponse.json({ error: "plusOne.name is required" }, { status: 400 });
     }
@@ -89,7 +85,7 @@ export async function POST(request: NextRequest) {
   // Compute new rsvpStatus
   const anyAttending =
     attendees.some((a) => a.attending) ||
-    (plusOne !== null && plusOne !== undefined && plusOne.attending);
+    (plusOne != null && plusOne.attending);
   const rsvpStatus = anyAttending ? "confirmed" : "declined";
 
   // Persist everything in a transaction

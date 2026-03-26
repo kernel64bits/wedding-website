@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { getGuestSession } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getSettings, prisma } from "@/lib/prisma";
 import { RsvpForm } from "@/components/rsvp-form";
 
 export default async function RsvpPage({
@@ -20,11 +20,7 @@ export default async function RsvpPage({
       where: { id: session.invitationId },
       include: { attendees: true },
     }),
-    prisma.settings.upsert({
-      where: { id: "singleton" },
-      create: { id: "singleton" },
-      update: {},
-    }),
+    getSettings(),
   ]);
 
   if (!invitation) redirect(`/${locale}`);

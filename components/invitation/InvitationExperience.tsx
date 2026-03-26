@@ -360,12 +360,10 @@ const ScrollProgressBar = memo(function ScrollProgressBar({
 // ── Main experience ───────────────────────────────────────────────────────────
 
 interface InvitationExperienceProps {
-  locale: string;
   invitationId: string | null;
 }
 
 export function InvitationExperience({
-  locale,
   invitationId,
 }: InvitationExperienceProps) {
   const [activeSection, setActiveSection] = useState(0);
@@ -387,8 +385,6 @@ export function InvitationExperience({
       <CelebrationSection key="celebration" />,
       <ClosingSection key="closing" />,
     ],
-    // locale is consumed inside ClosingSection via useTranslations — no prop needed
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

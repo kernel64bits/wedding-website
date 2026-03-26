@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { getGuestSession } from "@/lib/session";
-import { prisma } from "@/lib/prisma";
+import { getSettings, prisma } from "@/lib/prisma";
 import { SeatingMap } from "@/components/seating/SeatingMap";
 
 export default async function SeatingPage({
@@ -19,11 +19,7 @@ export default async function SeatingPage({
 
   const [invitation, settings] = await Promise.all([
     prisma.invitation.findUnique({ where: { id: session.invitationId } }),
-    prisma.settings.upsert({
-      where: { id: "singleton" },
-      create: { id: "singleton" },
-      update: {},
-    }),
+    getSettings(),
   ]);
 
   if (!invitation) redirect(`/${locale}`);
