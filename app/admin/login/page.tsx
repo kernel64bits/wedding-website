@@ -1,13 +1,6 @@
 import { redirect } from "next/navigation";
+import { LockKeyhole } from "lucide-react";
 import { getAdminSession } from "@/lib/session";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -22,53 +15,54 @@ export default async function AdminLoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Admin</CardTitle>
-          <CardDescription>
-            Connectez-vous pour accéder à l&apos;administration.
-          </CardDescription>
-        </CardHeader>
-        <form method="POST" action="/api/admin/login">
-          <CardContent className="flex flex-col gap-4">
-            {error === "invalid" && (
-              <p className="text-sm text-destructive">
-                Identifiant ou mot de passe incorrect.
-              </p>
-            )}
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="username" className="text-sm font-medium">
-                Identifiant
-              </label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="username"
-                required
-              />
+    <div className="flex min-h-[80vh] items-center justify-center px-6">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <LockKeyhole className="h-8 w-8 text-primary" strokeWidth={1.5} />
+          <div className="h-px w-12 bg-primary" />
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">Administration</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Sign in to the admin panel.
+            </p>
+          </div>
+        </div>
+
+        <form method="POST" action="/api/admin/login" className="space-y-4">
+          {error === "invalid" && (
+            <div className="rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2">
+              <p className="text-sm text-destructive">Invalid username or password.</p>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-sm font-medium">
-                Mot de passe
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full">
-              Se connecter
-            </Button>
-          </CardFooter>
+          )}
+          <div className="space-y-1.5">
+            <label htmlFor="username" className="text-sm font-medium">
+              Username
+            </label>
+            <Input
+              id="username"
+              name="username"
+              type="text"
+              autoComplete="username"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="text-sm font-medium">
+              Password
+            </label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full">
+            Sign in
+          </Button>
         </form>
-      </Card>
+      </div>
     </div>
   );
 }
