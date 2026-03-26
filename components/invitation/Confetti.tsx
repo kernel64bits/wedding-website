@@ -16,8 +16,8 @@ export const DEFAULT_CONFETTI_CONFIG = {
   maxRotate:   1440,  // ° — up to 4 rotations; faster spin → more lateral flutter
   minScale:    0.2,
   maxScale:    1.5,
-  minDuration: 4.5,   // s
-  maxDuration: 10,    // s
+  minDuration: 10,   // s
+  maxDuration: 20,    // s
   maxDelay:    0.4,   // s — burst stagger window
   maxDrift:    140,   // px — max lateral wobble amplitude
   colors: ["#f5f0e8", "#d4c5a9", "#c4a882", "#e8ddd0", "#ffffff"],

@@ -95,3 +95,11 @@ export function createAdminSessionValue(adminId: string): string {
 export function verifyAdminToken(raw: string): AdminSession | null {
   return hmacVerify<AdminSession>(raw);
 }
+
+/** Read and verify the admin session from the request cookie jar (server components). */
+export async function getAdminSession(): Promise<AdminSession | null> {
+  const jar = await cookies();
+  const raw = jar.get(ADMIN_COOKIE)?.value;
+  if (!raw) return null;
+  return verifyAdminToken(raw);
+}
