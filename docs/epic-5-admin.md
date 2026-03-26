@@ -1,18 +1,22 @@
 # Epic 5 — Admin Panel
 
-#### T5.1 — Admin login
-**Description:** Password-based login for the admin panel.
+#### T5.1 — Admin login ✅
+**Description:** Username + password login for the admin panel.
 **Acceptance criteria:**
-- Login page at `/admin/login`
-- Email + password form
-- Validates against `Admin` table (bcrypt hash comparison)
-- Sets admin session cookie (independent from guest cookie)
-- Redirects to `/admin/guests`
-- Seed script (`prisma/seed.ts`) to create the initial admin account
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] Login page at `/admin/login` — lock icon, clean centered layout, English UI
+- [x] Username + password form (Admin.email renamed to Admin.username)
+- [x] Validates against `Admin` table (bcrypt hash comparison via `bcryptjs`)
+- [x] Sets admin session cookie (independent from guest cookie, 8h)
+- [x] Redirects to `/admin/guests` on success
+- [x] Error banner on invalid credentials (same response for wrong user/pass — no enumeration)
+- [x] `POST /api/admin/logout` clears cookie, redirects to `/admin/login`
+- [x] Logout button in nav is a `<form method="POST">` (httpOnly-safe)
+- [x] `prisma/seed.mjs` creates initial admin (`username: admin / password: admin1234`)
+- [x] Already-authenticated redirect: `/admin/login` → `/admin/guests` if session active
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 ---
 

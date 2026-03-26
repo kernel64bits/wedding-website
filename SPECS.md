@@ -19,7 +19,7 @@ A bilingual (FR/EN) wedding website. Everything is private — unauthenticated u
 | Database    | Prisma + SQLite         | Zero-config dev, swap to PostgreSQL for prod      |
 | i18n        | next-intl               | Lightweight, supports URL prefix (`/fr`, `/en`)  |
 | Auth        | Custom QR token + cookie| No password for guests, simple and secure        |
-| Admin auth  | Email + password (bcrypt + session cookie) | Simple, just for the couple |
+| Admin auth  | Username + password (bcrypt + session cookie) | Simple, just for the couple |
 
 ### Design Principles
 
@@ -70,7 +70,7 @@ app/
 7. Guests can replay the invitation at any time from the dashboard.
 
 **Admin:**
-- Email + password login at `/admin/login`.
+- Username + password login at `/admin/login`.
 - Sets a separate admin session cookie (independent from guest cookie).
 - Double-protected: middleware rejects requests without a valid admin cookie, AND `app/admin/(protected)/layout.tsx` calls `getAdminSession()` server-side and redirects — neither layer depends on the other.
 
@@ -109,7 +109,7 @@ Attendee {
 
 Admin {
   id            String   @id @default(cuid())
-  email         String   @unique
+  username      String   @unique
   passwordHash  String
 }
 

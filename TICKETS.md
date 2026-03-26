@@ -20,7 +20,7 @@
 | T4.3 | Practical info page | ✅ Done | [epic-4](docs/epic-4-dashboard.md) |
 | T4.4 | Seating map | ✅ Done | [epic-4](docs/epic-4-dashboard.md) |
 | T4.5 | Photo gallery | ⬜ Todo | [epic-4](docs/epic-4-dashboard.md) |
-| T5.1 | Admin login | ⬜ Todo | [epic-5](docs/epic-5-admin.md) |
+| T5.1 | Admin login | ✅ Done | [epic-5](docs/epic-5-admin.md) |
 | T5.2 | Guest list dashboard | ⬜ Todo | [epic-5](docs/epic-5-admin.md) |
 | T5.3 | Guest detail & manual override | ⬜ Todo | [epic-5](docs/epic-5-admin.md) |
 | T5.4 | QR code bulk export | ⬜ Todo | [epic-5](docs/epic-5-admin.md) |
