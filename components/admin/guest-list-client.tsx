@@ -75,9 +75,7 @@ export function GuestListClient({
   const [newGroupLabel, setNewGroupLabel] = useState("");
   const [newAllowPlusOne, setNewAllowPlusOne] = useState(false);
   const [newTableNumber, setNewTableNumber] = useState("");
-  const [newAttendees, setNewAttendees] = useState([
-    { name: "", isPrimary: true },
-  ]);
+  const [newAttendees, setNewAttendees] = useState([{ name: "" }]);
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -89,7 +87,7 @@ export function GuestListClient({
       setNewGroupLabel("");
       setNewAllowPlusOne(false);
       setNewTableNumber("");
-      setNewAttendees([{ name: "", isPrimary: true }]);
+      setNewAttendees([{ name: "" }]);
     } else if (selectedInv) {
       setEditTableNumber(selectedInv.tableNumber?.toString() ?? "");
     }
@@ -145,7 +143,7 @@ export function GuestListClient({
         groupLabel: newGroupLabel,
         allowPlusOne: newAllowPlusOne,
         tableNumber: newTableNumber !== "" ? Number(newTableNumber) : null,
-        attendees,
+        attendees: attendees.map((a, i) => ({ ...a, isPrimary: i === 0 })),
       }),
     });
   }
@@ -359,34 +357,12 @@ export function GuestListClient({
                           placeholder="Full name"
                           className="flex-1"
                         />
-                        <label className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <input
-                            type="radio"
-                            name="primary"
-                            checked={a.isPrimary}
-                            onChange={() => {
-                              setNewAttendees(
-                                newAttendees.map((att, j) => ({
-                                  ...att,
-                                  isPrimary: j === i,
-                                }))
-                              );
-                            }}
-                          />
-                          Primary
-                        </label>
                         {newAttendees.length > 1 && (
                           <button
                             type="button"
                             onClick={() =>
                               setNewAttendees(
-                                newAttendees
-                                  .filter((_, j) => j !== i)
-                                  .map((att, j) =>
-                                    j === 0
-                                      ? { ...att, isPrimary: true }
-                                      : att
-                                  )
+                                newAttendees.filter((_, j) => j !== i)
                               )
                             }
                             className="text-muted-foreground hover:text-destructive"
@@ -401,10 +377,7 @@ export function GuestListClient({
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        setNewAttendees([
-                          ...newAttendees,
-                          { name: "", isPrimary: false },
-                        ])
+                        setNewAttendees([...newAttendees, { name: "" }])
                       }
                     >
                       <Plus className="mr-1 h-3 w-3" />
