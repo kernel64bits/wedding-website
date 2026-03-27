@@ -92,7 +92,7 @@
 - Language switcher changes locale and stays on the equivalent page
 
 **Test data strategy:**
-- Use a dedicated test invitation seeded into the dev DB (`token: "e2e-test-token"`, `language: "fr"`)
+- Use a dedicated test invitation seeded into the dev DB (`token: "e2e-test-token"`)
 - Seed script: `prisma/seed-e2e.ts` (separate from the main seed, safe to re-run)
 - Playwright `globalSetup` calls the seed script before the test suite
 
@@ -109,15 +109,14 @@
 
 **`tests/e2e/admin-auth.spec.ts`**
 - Visiting `/admin/guests` without admin session redirects to `/admin/login`
-- Valid admin email + password → redirects to `/admin/guests`
+- Valid admin username + password → redirects to `/admin/guests`
 - Invalid credentials → error message shown, no redirect
 - Admin session expires after 8 hours (verify cookie `maxAge`)
 
 **`tests/e2e/admin-guests.spec.ts`**
 - Guest list page loads and displays at least one invitation (the E2E seed data)
 - Search by name filters the list
-- Clicking a row navigates to `/admin/guests/[id]`
-- Guest detail page shows invitation fields
+- Clicking a row opens the side sheet with invitation details
 
 **`tests/e2e/middleware.spec.ts`** *(regression suite for T2.6)*
 - Guest cookie → `/fr/home` accessible
@@ -133,3 +132,45 @@
 - [ ] Post-ticket check: code quality reviewed
 - [ ] Post-ticket check: refactor opportunities identified and addressed
 - [ ] Post-ticket check: directory layout is clean and well-organized
+
+---
+
+#### T8.5 — GitHub Actions CI pipeline
+**Description:** Set up a GitHub Actions workflow that runs the full test suite automatically on every push and pull request. The pipeline runs without Docker — tests execute directly on GitHub's Ubuntu runners.
+**Depends on:** T8.1, T8.2, T8.3, T8.4
+
+**Acceptance criteria:**
+
+**`.github/workflows/ci.yml`** with two jobs:
+
+*`unit-tests` job:*
+- Runs on: `ubuntu-latest`
+- Trigger: push to `main`, any pull request
+- Steps:
+  - Checkout repo
+  - Setup Node.js (match version in `package.json` `engines` field)
+  - `npm ci`
+  - Set `SESSION_SECRET` from GitHub secret
+  - `npm run test` (Vitest)
+  - Upload coverage report as artifact
+
+*`e2e-tests` job:*
+- Runs on: `ubuntu-latest`
+- Steps:
+  - Checkout repo + `npm ci`
+  - `npx playwright install --with-deps chromium`
+  - Create `.env` from GitHub secrets (`DATABASE_URL=file:./dev.db`, `SESSION_SECRET`, `BASE_URL=http://localhost:3000`)
+  - `npx prisma db push`
+  - `node prisma/seed.mjs` + `node prisma/seed-e2e.mjs`
+  - Start Next.js: `npm run dev &` + wait for `localhost:3000`
+  - `npm run test:e2e`
+  - Upload Playwright HTML report as artifact on failure
+
+**GitHub secrets to configure (document in README):**
+- `SESSION_SECRET` — HMAC signing key
+
+**Branch protection recommendation:** require `unit-tests` to pass before merging to `main`.
+
+- [ ] Post-ticket check: pipeline passes on clean push to main
+- [ ] Post-ticket check: a failing test causes the pipeline to fail
+- [ ] Post-ticket check: Playwright report artifact visible in GitHub Actions UI on failure

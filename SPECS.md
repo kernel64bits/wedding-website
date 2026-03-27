@@ -51,8 +51,7 @@ app/
     └── (protected)/              ← route group: getAdminSession() gate
         ├── layout.tsx            ← redirects to /admin/login if no admin session
         ├── guests/
-        │   ├── page.tsx          ← guest list + summary stats
-        │   └── [id]/page.tsx     ← guest detail + manual override
+        │   └── page.tsx          ← single dashboard: stats + list + side sheet (detail/create)
         └── tables/page.tsx       ← table management
 ```
 
@@ -64,8 +63,8 @@ app/
 1. Each invitation (guest/household) gets a unique token stored in DB.
 2. A QR code encodes: `https://yoursite.com/login?token=<token>`
 3. `GET /api/login?token=<token>` validates the token, sets a secure HTTP-only cookie (30-day session containing invitation ID + expiry).
-4. **First visit** (`invitationViewedAt` is null): redirect to `/{locale}/invitation`. Set `invitationViewedAt` timestamp.
-5. **Returning visits** (`invitationViewedAt` is set): redirect to `/{locale}/home`.
+4. **First visit** (`invitationViewedAt` is null): redirect to `/fr/invitation`. Set `invitationViewedAt` timestamp.
+5. **Returning visits** (`invitationViewedAt` is set): redirect to `/fr/home`.
 6. Any protected route without a valid session cookie → redirect to `/{locale}` (gate page).
 7. Guests can replay the invitation at any time from the dashboard.
 
