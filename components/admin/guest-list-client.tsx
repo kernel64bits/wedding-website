@@ -293,6 +293,7 @@ export function GuestListClient({
         <SheetContent
           side="right"
           className="w-full overflow-y-auto sm:max-w-md"
+          aria-describedby={undefined}
         >
           {selectedId === "new" ? (
             /* ── Create form ── */

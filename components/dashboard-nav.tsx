@@ -58,7 +58,7 @@ export function DashboardNav() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-4/5">
+            <SheetContent side="right" className="w-4/5" aria-describedby={undefined}>
               <SheetTitle className="sr-only">Navigation</SheetTitle>
               <div className="mt-8 flex flex-col items-center gap-6 text-center">
                 <p className="font-serif text-lg font-light">Sophie & John</p>
