@@ -39,11 +39,11 @@
 **Description:** View and edit an individual invitation record.
 **Acceptance criteria:**
 - Accessible from guest list: click a row → `/admin/guests/[id]`
-- Shows all invitation fields: group label, email, language, allowPlusOne, RSVP status, table, last login, invitationViewedAt, token
+- Shows all invitation fields: group label, allowPlusOne, RSVP status, table, last login, invitationViewedAt, token
 - Lists all attendees with attending status and dietary info
 - QR code preview (uses T2.4 utility)
-- Admin can edit: group label, email, language, allowPlusOne, table number
-- Admin can add/remove/edit attendees and manually override RSVP status and dietary details
+- Admin can edit: group label, allowPlusOne, table number
+- Admin can add/remove/edit attendees
 - Save → `PATCH /api/admin/invitations/[id]`
 - [ ] Post-ticket check: acceptance criteria verified (functional test)
 - [ ] Post-ticket check: code quality reviewed

@@ -10,8 +10,6 @@ model Invitation {
   id              String     @id @default(cuid())
   token           String     @unique
   groupLabel      String
-  email           String?
-  language        String     @default("fr")
   allowPlusOne    Boolean    @default(false)
   rsvpStatus      String     @default("pending")
   tableNumber     Int?

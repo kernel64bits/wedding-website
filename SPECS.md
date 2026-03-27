@@ -81,8 +81,6 @@ Invitation {
   id                  String    @id @default(cuid())
   token               String    @unique
   groupLabel          String                        // e.g. "Famille Dupont"
-  email               String?
-  language            String    @default("fr")      // "fr" | "en"
   allowPlusOne        Boolean   @default(false)
   rsvpStatus          String    @default("pending") // pending | confirmed | declined
   tableNumber         Int?
@@ -148,6 +146,7 @@ Ticket details are split by epic:
 | Epic 6 — Table Assignment (Bonus) | [docs/epic-6-tables.md](docs/epic-6-tables.md) |
 | Epic 7 — Production Readiness | [docs/epic-7-production.md](docs/epic-7-production.md) |
 | Epic 8 — QA & Testing | [docs/epic-8-qa.md](docs/epic-8-qa.md) |
+| Epic 9 — Data Model Redesign | [docs/epic-9-data-model.md](docs/epic-9-data-model.md) |
 
 ---
 

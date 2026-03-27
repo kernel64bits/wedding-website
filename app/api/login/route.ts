@@ -21,10 +21,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(invalidUrl);
   }
 
-  const locale = invitation.language ?? "fr";
   const destination = invitation.invitationViewedAt === null
-    ? `/${locale}/invitation`
-    : `/${locale}/home`;
+    ? "/fr/invitation"
+    : "/fr/home";
 
   await prisma.invitation.update({
     where: { id: invitation.id },

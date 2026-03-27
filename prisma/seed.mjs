@@ -13,8 +13,6 @@ await prisma.invitation.upsert({
   create: {
     token: "test-token-123",
     groupLabel: "Famille Test",
-    email: "test@example.com",
-    language: "fr",
     attendees: {
       create: { name: "Sophie Test", isPrimary: true },
     },
