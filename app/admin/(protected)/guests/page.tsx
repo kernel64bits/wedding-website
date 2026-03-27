@@ -32,6 +32,8 @@ export default async function AdminGuestsPage() {
     orderBy: { createdAt: "asc" },
   });
 
+  const baseUrl = process.env.BASE_URL ?? "http://localhost:3000";
+
   const attending = invitations
     .flatMap((i) => i.attendees)
     .filter((a) => a.attending === true).length;
@@ -75,7 +77,7 @@ export default async function AdminGuestsPage() {
         />
       </div>
 
-      <GuestListClient invitations={invitations} />
+      <GuestListClient invitations={invitations} baseUrl={baseUrl} />
     </div>
   );
 }

@@ -35,23 +35,23 @@
 
 ---
 
-#### T5.3 — Guest detail sheet & create invitation
+#### T5.3 — Guest detail sheet & create invitation ✅
 **Description:** Enhance the guest list dashboard into a single self-contained admin panel.
 Clicking a row opens a side sheet for viewing/editing. A "+ New" button opens the same sheet for creating.
 No separate detail page — everything lives in `/admin/guests`.
 **Acceptance criteria:**
-- "+ New" button in page header opens a side sheet with an empty create form
-- Clicking any row opens the side sheet with that invitation's data
-- **Create form fields:** group label (required), allow +1, table number (optional), attendee names (at least one)
-- **Edit form fields:** group label, allow +1, table number (editable); RSVP status, dates, token, login URL (read-only); attendees list read-only
-- Create → `POST /api/admin/invitations` (generates token automatically)
-- Edit → `PATCH /api/admin/invitations/[id]`
-- After save: sheet closes, list refreshes in place (no page reload)
-- Delete placeholder page `app/admin/(protected)/guests/[id]/page.tsx`
-- [ ] Post-ticket check: acceptance criteria verified (functional test)
-- [ ] Post-ticket check: code quality reviewed
-- [ ] Post-ticket check: refactor opportunities identified and addressed
-- [ ] Post-ticket check: directory layout is clean and well-organized
+- [x] "+ New" button in page header opens a side sheet with an empty create form
+- [x] Clicking any row opens the side sheet with that invitation's data
+- [x] **Create form fields:** group label (required), allow +1, table number (optional), attendee names (at least one)
+- [x] **Edit form fields:** group label, allow +1, table number (editable); RSVP status, dates, token, login URL (read-only); attendees list read-only
+- [x] Create → `POST /api/admin/invitations` (generates token automatically)
+- [x] Edit → `PATCH /api/admin/invitations/[id]`
+- [x] After save: sheet closes, list refreshes in place (no page reload)
+- [x] Deleted placeholder page `app/admin/(protected)/guests/[id]/page.tsx`
+- [x] Post-ticket check: acceptance criteria verified (functional test)
+- [x] Post-ticket check: code quality reviewed
+- [x] Post-ticket check: refactor opportunities identified and addressed
+- [x] Post-ticket check: directory layout is clean and well-organized
 
 ---
 

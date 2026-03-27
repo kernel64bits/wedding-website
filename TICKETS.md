@@ -22,7 +22,7 @@
 | T4.5 | Photo gallery | ⬜ Todo | [epic-4](docs/epic-4-dashboard.md) |
 | T5.1 | Admin login | ✅ Done | [epic-5](docs/epic-5-admin.md) |
 | T5.2 | Guest list dashboard | ✅ Done | [epic-5](docs/epic-5-admin.md) |
-| T5.3 | Guest detail sheet & create invitation | 🔜 Next | [epic-5](docs/epic-5-admin.md) |
+| T5.3 | Guest detail sheet & create invitation | ✅ Done | [epic-5](docs/epic-5-admin.md) |
 | T5.4 | QR code bulk export | ⬜ Todo | [epic-5](docs/epic-5-admin.md) |
 | T5.5 | QR code image generation | ⬜ Todo | [epic-5](docs/epic-5-admin.md) |
 | T6.1 | Table management CRUD | ⬜ Bonus | [epic-6](docs/epic-6-tables.md) |
