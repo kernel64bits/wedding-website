@@ -24,7 +24,7 @@ model Invitation {
 model Attendee {
   id                  String     @id @default(cuid())
   invitationId        String
-  invitation          Invitation @relation(fields: [invitationId], references: [id])
+  invitation          Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
   name                String
   isPrimary           Boolean    @default(false)
   isPlusOne           Boolean    @default(false)

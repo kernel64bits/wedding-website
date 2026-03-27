@@ -16,6 +16,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -68,8 +69,6 @@ export function GuestListClient({
       : null;
 
   // Edit form
-  const [editGroupLabel, setEditGroupLabel] = useState("");
-  const [editAllowPlusOne, setEditAllowPlusOne] = useState(false);
   const [editTableNumber, setEditTableNumber] = useState("");
 
   // Create form
@@ -81,17 +80,17 @@ export function GuestListClient({
   ]);
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   useEffect(() => {
     setSaveStatus("idle");
+    setDeleteConfirm(false);
     if (selectedId === "new") {
       setNewGroupLabel("");
       setNewAllowPlusOne(false);
       setNewTableNumber("");
       setNewAttendees([{ name: "", isPrimary: true }]);
     } else if (selectedInv) {
-      setEditGroupLabel(selectedInv.groupLabel);
-      setEditAllowPlusOne(selectedInv.allowPlusOne);
       setEditTableNumber(selectedInv.tableNumber?.toString() ?? "");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,19 +111,10 @@ export function GuestListClient({
     return true;
   });
 
-  async function handleSaveEdit() {
-    if (!selectedId || selectedId === "new") return;
+  async function submitRequest(url: string, init: RequestInit) {
     setSaveStatus("saving");
     try {
-      const res = await fetch(`/api/admin/invitations/${selectedId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          groupLabel: editGroupLabel,
-          allowPlusOne: editAllowPlusOne,
-          tableNumber: editTableNumber !== "" ? Number(editTableNumber) : null,
-        }),
-      });
+      const res = await fetch(url, init);
       if (!res.ok) throw new Error();
       setSaveStatus("saved");
       router.refresh();
@@ -134,40 +124,49 @@ export function GuestListClient({
     }
   }
 
-  async function handleCreate() {
+  function handleSaveEdit() {
+    if (!selectedId || selectedId === "new") return;
+    submitRequest(`/api/admin/invitations/${selectedId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tableNumber: editTableNumber !== "" ? Number(editTableNumber) : null,
+      }),
+    });
+  }
+
+  function handleCreate() {
     const attendees = newAttendees.filter((a) => a.name.trim());
     if (!newGroupLabel.trim() || attendees.length === 0) return;
-    setSaveStatus("saving");
+    submitRequest("/api/admin/invitations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        groupLabel: newGroupLabel,
+        allowPlusOne: newAllowPlusOne,
+        tableNumber: newTableNumber !== "" ? Number(newTableNumber) : null,
+        attendees,
+      }),
+    });
+  }
+
+  async function handleDelete() {
+    if (!selectedId || selectedId === "new") return;
     try {
-      const res = await fetch("/api/admin/invitations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          groupLabel: newGroupLabel,
-          allowPlusOne: newAllowPlusOne,
-          tableNumber: newTableNumber !== "" ? Number(newTableNumber) : null,
-          attendees,
-        }),
-      });
-      if (!res.ok) throw new Error();
-      setSaveStatus("saved");
+      await fetch(`/api/admin/invitations/${selectedId}`, { method: "DELETE" });
       router.refresh();
-      setTimeout(() => setSelectedId(null), 600);
+      setSelectedId(null);
     } catch {
       setSaveStatus("error");
     }
   }
 
-  function saveLabel() {
-    if (saveStatus === "saving") return "Saving…";
-    if (saveStatus === "saved") return "Saved ✓";
-    if (saveStatus === "error") return "Error — try again";
-    return selectedId === "new" ? "Create" : "Save Changes";
-  }
-
-  const loginUrl = selectedInv
-    ? `${baseUrl}/api/login?token=${selectedInv.token}`
-    : "";
+  const saveLabels: Record<SaveStatus, string> = {
+    idle: selectedId === "new" ? "Create" : "Save Changes",
+    saving: "Saving…",
+    saved: "Saved ✓",
+    error: "Error — try again",
+  };
 
   return (
     <div className="space-y-4">
@@ -293,13 +292,15 @@ export function GuestListClient({
         <SheetContent
           side="right"
           className="w-full overflow-y-auto sm:max-w-md"
-          aria-describedby={undefined}
         >
           {selectedId === "new" ? (
             /* ── Create form ── */
             <>
               <SheetHeader className="px-6 pt-6">
                 <SheetTitle>New Invitation</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Create a new invitation with attendees
+                </SheetDescription>
               </SheetHeader>
 
               <div className="space-y-4 px-6 pb-6">
@@ -418,7 +419,7 @@ export function GuestListClient({
                     disabled={saveStatus === "saving"}
                     onClick={handleCreate}
                   >
-                    {saveLabel()}
+                    {saveLabels[saveStatus]}
                   </Button>
                   {saveStatus === "error" && (
                     <p className="text-sm text-destructive">
@@ -433,6 +434,9 @@ export function GuestListClient({
             <>
               <SheetHeader className="px-6 pt-6">
                 <SheetTitle>{selectedInv.groupLabel}</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Edit invitation details
+                </SheetDescription>
               </SheetHeader>
 
               <div className="space-y-4 px-6 pb-6">
@@ -457,7 +461,7 @@ export function GuestListClient({
                     disabled={saveStatus === "saving"}
                     onClick={handleSaveEdit}
                   >
-                    {saveLabel()}
+                    {saveLabels[saveStatus]}
                   </Button>
                   {saveStatus === "error" && (
                     <p className="text-sm text-destructive">
@@ -480,7 +484,7 @@ export function GuestListClient({
                     <p className="mb-1 text-muted-foreground">Login URL</p>
                     <Input
                       readOnly
-                      value={loginUrl}
+                      value={`${baseUrl}/api/login?token=${selectedInv.token}`}
                       className="bg-muted text-xs"
                       onClick={(e) =>
                         (e.target as HTMLInputElement).select()
@@ -524,6 +528,37 @@ export function GuestListClient({
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Delete */}
+                <div className="border-t pt-4">
+                  {deleteConfirm ? (
+                    <div className="flex items-center gap-3">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={handleDelete}
+                      >
+                        Confirm delete
+                      </Button>
+                      <button
+                        type="button"
+                        className="text-sm text-muted-foreground hover:underline"
+                        onClick={() => setDeleteConfirm(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      onClick={() => setDeleteConfirm(true)}
+                    >
+                      Delete invitation
+                    </Button>
+                  )}
                 </div>
               </div>
             </>

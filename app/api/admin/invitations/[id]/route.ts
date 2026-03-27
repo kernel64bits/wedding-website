@@ -10,13 +10,37 @@ export async function PATCH(
   if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const { groupLabel, allowPlusOne, tableNumber } = await request.json();
+  const body = await request.json();
 
-  const updated = await prisma.invitation.update({
-    where: { id },
-    data: { groupLabel, allowPlusOne, tableNumber },
-    include: { attendees: { orderBy: { isPrimary: "desc" } } },
-  });
+  try {
+    const updated = await prisma.invitation.update({
+      where: { id },
+      data: {
+        groupLabel: body.groupLabel,
+        allowPlusOne: body.allowPlusOne,
+        tableNumber: body.tableNumber,
+      },
+      include: { attendees: { orderBy: { isPrimary: "desc" } } },
+    });
+    return Response.json(updated);
+  } catch {
+    return Response.json({ error: "Not found" }, { status: 404 });
+  }
+}
 
-  return Response.json(updated);
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getAdminSession();
+  if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await params;
+
+  try {
+    await prisma.invitation.delete({ where: { id } });
+    return new Response(null, { status: 204 });
+  } catch {
+    return Response.json({ error: "Not found" }, { status: 404 });
+  }
 }
