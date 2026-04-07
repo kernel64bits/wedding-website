@@ -2,7 +2,7 @@
 
 A bilingual (FR/EN) wedding website with a public section, a private guest area (RSVP, seating map), and an admin panel.
 
-**Stack:** Next.js 16 · Tailwind CSS v4 · shadcn/ui · Prisma 7 · SQLite · Docker
+**Stack:** Next.js 16 · Tailwind CSS v4 · shadcn/ui · Prisma 7 · SQLite · MinIO (S3) · Docker
 
 ---
 
@@ -11,14 +11,34 @@ A bilingual (FR/EN) wedding website with a public section, a private guest area 
 **Prerequisites:** Docker and Docker Compose.
 
 ```bash
-# Start the dev server (http://localhost:3000)
+# Copy environment variables (first time only)
+cp .env.example .env
+# Generate a session secret
+openssl rand -hex 32
+# Paste the output into .env as SESSION_SECRET=...
+
+# Start all services (app + MinIO)
 docker compose up --build
 
 # Initialize the database (first time only)
 docker compose exec app npx prisma db push
+
+# Seed test data
+docker compose exec app node prisma/seed.mjs
+docker compose exec app node prisma/seed-guests.mjs
+docker compose exec app node scripts/seed-photos.mjs
 ```
 
 Day-to-day, `docker compose up` is enough — hot reload is enabled via bind mount.
+
+### Services
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| App | http://localhost:3000 | Next.js dev server |
+| MinIO API | http://localhost:9000 | S3-compatible object storage (photos) |
+| MinIO Console | http://localhost:9001 | Web UI to browse buckets (login: `minioadmin` / `minioadmin`) |
+| Prisma Studio | http://localhost:5555 | Database browser (start manually, see below) |
 
 ---
 
@@ -27,7 +47,6 @@ Day-to-day, `docker compose up` is enough — hot reload is enabled via bind mou
 **Add a shadcn/ui component**
 ```bash
 docker compose exec app npx shadcn@latest add <component>
-# e.g. npx shadcn@latest add dialog
 ```
 The file appears in `components/ui/` on your host. Commit it.
 
@@ -46,11 +65,18 @@ docker compose exec app npx prisma studio --browser none --port 5555
 ```
 Then open http://localhost:5555 in your browser.
 
-**Seed test data**
+**Seed data**
 ```bash
+# Core data (admin account + test invitation)
 docker compose exec app node prisma/seed.mjs
+
+# Sample guest invitations (9 realistic entries)
+docker compose exec app node prisma/seed-guests.mjs
+
+# Sample photos to MinIO (6 wedding photos)
+docker compose exec app node scripts/seed-photos.mjs
 ```
-Creates a test invitation with token `test-token-123`. Never run in production.
+Seeds are idempotent — re-running them overwrites existing data. Never run `seed.mjs` in production (it creates a test token).
 
 **Log in as a guest**
 ```
@@ -58,16 +84,33 @@ http://localhost:3000/api/login?token=<token>
 ```
 Validates the token, sets the session cookie, and redirects to `/invitation` (first visit) or `/home` (returning visit). Use `test-token-123` after seeding.
 
+**Log in as admin**
+Navigate to http://localhost:3000/admin/login. Default credentials after seeding: `admin` / `admin1234`.
+
 ---
 
 ## Project structure
 
 ```
-app/              # Next.js App Router pages and layouts
-components/ui/    # shadcn/ui components (committed, not generated)
-lib/              # prisma.ts (singleton), utils.ts (cn helper)
-prisma/           # schema.prisma
-messages/         # i18n translation files (fr.json, en.json)
+app/                  # Next.js App Router pages and layouts
+  [locale]/           #   Guest-facing pages (i18n routed)
+  admin/              #   Admin panel (no i18n)
+  api/                #   API routes (login, rsvp, admin CRUD)
+components/
+  ui/                 #   shadcn/ui components (committed source files)
+  admin/              #   Admin-specific components (guest list, etc.)
+  gallery/            #   Photo gallery components (planned)
+  invitation/         #   Cinematic invitation page components
+lib/                  # Shared utilities
+  prisma.ts           #   Prisma client singleton + getSettings()
+  session.ts          #   HMAC session signing/verification (Web Crypto API)
+  storage.ts          #   S3 client singleton + listPhotos() + getDownloadUrl()
+  utils.ts            #   cn() helper (clsx + tailwind-merge)
+middleware.ts         # Route protection (allowlist + default deny)
+prisma/               # Database schema and seed scripts
+scripts/              # Utility scripts (photo seeding)
+messages/             # i18n translation files (fr.json, en.json)
+docs/                 # Epic specs and ticket tracking
 ```
 
 ---
@@ -91,6 +134,8 @@ messages/         # i18n translation files (fr.json, en.json)
 | `@prisma/adapter-libsql` | 7 | Prisma adapter for libsql (Turso-compatible SQLite driver) |
 | `@libsql/client` | 0.15 | Low-level libsql client used by the Prisma adapter |
 | `bcryptjs` | 3 | Password hashing for admin authentication (pure JS, no native bindings) |
+| `@aws-sdk/client-s3` | 3 | S3 client — list/get/put objects in MinIO (dev) or AWS S3 (prod) |
+| `@aws-sdk/s3-request-presigner` | 3 | Generate presigned URLs for photo downloads |
 
 ### Dev only
 
@@ -116,12 +161,48 @@ These are **copied source files**, not npm packages. They depend only on `radix-
 | `table.tsx` | Guest list table in the admin dashboard |
 | `dialog.tsx` | *(planned — T4.5)* Full-screen lightbox for the photo gallery |
 
+### Infrastructure
+
+| Service | Image | Purpose |
+|---------|-------|---------|
+| MinIO | `minio/minio` | S3-compatible object storage for wedding photos (local dev) |
+
 ---
 
-## Environment
+## Environment variables
 
-Copy `.env.example` to `.env` before first run (already done if you cloned the repo):
+Copy `.env.example` to `.env` before first run:
 
 ```bash
 cp .env.example .env
 ```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATABASE_URL` | `file:./dev.db` | SQLite database path |
+| `SESSION_SECRET` | *(required)* | 64 hex chars — run `openssl rand -hex 32` to generate |
+| `BASE_URL` | `http://localhost:3000` | App URL (used for login URLs in QR codes) |
+| `S3_ENDPOINT` | `http://localhost:9000` | S3 API endpoint (MinIO locally, real S3 in prod) |
+| `S3_BUCKET` | `wedding-photos` | Bucket name for photo storage |
+| `S3_REGION` | `us-east-1` | AWS region |
+| `S3_ACCESS_KEY_ID` | `minioadmin` | S3 access key (MinIO defaults locally) |
+| `S3_SECRET_ACCESS_KEY` | `minioadmin` | S3 secret key |
+
+> Inside Docker, `S3_ENDPOINT` is overridden to `http://minio:9000` (Docker internal network). The `.env` value (`localhost:9000`) is for running Next.js outside Docker.
+
+---
+
+## Setting up on a new machine
+
+```bash
+git clone <repo-url> && cd wedding-website
+cp .env.example .env
+# Edit .env: set SESSION_SECRET (openssl rand -hex 32)
+docker compose up --build -d
+docker compose exec app npx prisma db push
+docker compose exec app node prisma/seed.mjs
+docker compose exec app node prisma/seed-guests.mjs
+docker compose exec app node scripts/seed-photos.mjs
+```
+
+The database and MinIO volume start empty on a fresh clone. Seeds populate both.

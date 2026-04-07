@@ -8,9 +8,12 @@
     "start": "next start",
     "lint": "eslint .",
     "db:seed": "node prisma/seed.mjs",
-    "db:seed-guests": "node prisma/seed-guests.mjs"
+    "db:seed-guests": "node prisma/seed-guests.mjs",
+    "db:seed-photos": "node scripts/seed-photos.mjs"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
+    "@aws-sdk/s3-request-presigner": "^3.750.0",
     "@libsql/client": "^0.15.4",
     "@prisma/adapter-libsql": "^7.5.0",
     "@prisma/client": "^7.5.0",
