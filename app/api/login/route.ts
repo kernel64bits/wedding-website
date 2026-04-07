@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   });
 
   const response = NextResponse.redirect(new URL(destination, requestOrigin(request)));
-  response.cookies.set(GUEST_COOKIE, createSessionValue(invitation.id), {
+  response.cookies.set(GUEST_COOKIE, await createSessionValue(invitation.id), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

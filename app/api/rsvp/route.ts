@@ -55,6 +55,9 @@ export async function POST(request: NextRequest) {
   }
 
   for (const a of attendees) {
+    if (typeof a.id !== "string" || a.id.trim().length === 0) {
+      return NextResponse.json({ error: "Each attendee must have a valid id" }, { status: 400 });
+    }
     if (typeof a.attending !== "boolean") {
       return NextResponse.json({ error: "attending must be boolean" }, { status: 400 });
     }

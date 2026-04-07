@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   if (!valid) return NextResponse.redirect(invalidUrl);
 
   const response = NextResponse.redirect(new URL("/admin/guests", origin));
-  response.cookies.set(ADMIN_COOKIE, createAdminSessionValue(admin.id), {
+  response.cookies.set(ADMIN_COOKIE, await createAdminSessionValue(admin.id), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

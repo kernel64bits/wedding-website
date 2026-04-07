@@ -271,7 +271,8 @@ export function RsvpForm({ invitation, rsvpLocked }: Props) {
 
       setStatus("success");
       setEditing(false);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
     }
   }

@@ -12,21 +12,35 @@ export async function POST(request: NextRequest) {
   const { groupLabel, allowPlusOne, tableNumber, attendees } =
     await request.json();
 
-  if (!groupLabel || !Array.isArray(attendees) || attendees.length === 0) {
-    return Response.json({ error: "Invalid payload" }, { status: 400 });
-  }
+  if (typeof groupLabel !== "string" || groupLabel.trim().length === 0)
+    return Response.json({ error: "groupLabel must be a non-empty string" }, { status: 400 });
+  if (allowPlusOne !== undefined && typeof allowPlusOne !== "boolean")
+    return Response.json({ error: "allowPlusOne must be a boolean" }, { status: 400 });
+  if (tableNumber !== undefined && tableNumber !== null && (typeof tableNumber !== "number" || !Number.isInteger(tableNumber)))
+    return Response.json({ error: "tableNumber must be an integer or null" }, { status: 400 });
+  if (!Array.isArray(attendees) || attendees.length === 0)
+    return Response.json({ error: "attendees must be a non-empty array" }, { status: 400 });
+
+  const validAttendees = attendees.filter(
+    (a: unknown): a is AttendeeInput =>
+      typeof a === "object" && a !== null &&
+      typeof (a as AttendeeInput).name === "string" &&
+      (a as AttendeeInput).name.trim().length > 0
+  );
+  if (validAttendees.length === 0)
+    return Response.json({ error: "At least one attendee with a non-empty name is required" }, { status: 400 });
 
   try {
     const created = await prisma.invitation.create({
       data: {
         token: randomBytes(16).toString("hex"),
-        groupLabel,
+        groupLabel: groupLabel.trim(),
         allowPlusOne: allowPlusOne ?? false,
         tableNumber: tableNumber ?? null,
         attendees: {
-          create: (attendees as AttendeeInput[]).map((a) => ({
-            name: a.name,
-            isPrimary: a.isPrimary,
+          create: validAttendees.map((a) => ({
+            name: a.name.trim(),
+            isPrimary: !!a.isPrimary,
             isPlusOne: false,
           })),
         },

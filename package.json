@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "db:seed": "node prisma/seed.mjs"
+    "db:seed": "node prisma/seed.mjs",
+    "db:seed-guests": "node prisma/seed-guests.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.15.4",

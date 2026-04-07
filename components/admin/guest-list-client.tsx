@@ -117,7 +117,8 @@ export function GuestListClient({
       setSaveStatus("saved");
       router.refresh();
       setTimeout(() => setSelectedId(null), 600);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setSaveStatus("error");
     }
   }
@@ -154,7 +155,8 @@ export function GuestListClient({
       await fetch(`/api/admin/invitations/${selectedId}`, { method: "DELETE" });
       router.refresh();
       setSelectedId(null);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setSaveStatus("error");
     }
   }

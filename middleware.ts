@@ -21,14 +21,14 @@ const GUEST_ROUTES = new Set([
   "seating",
 ]);
 
-export default function proxy(request: NextRequest): NextResponse {
+export default async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
   // ── 1 & 2. Admin routes ───────────────────────────────────────────────────
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") return NextResponse.next();
     const raw = request.cookies.get(ADMIN_COOKIE)?.value;
-    if (!raw || !verifyAdminToken(raw))
+    if (!raw || !(await verifyAdminToken(raw)))
       return NextResponse.redirect(new URL("/admin/login", request.url));
     return NextResponse.next();
   }
@@ -46,7 +46,7 @@ export default function proxy(request: NextRequest): NextResponse {
     if (process.env.NODE_ENV === "production")
       return NextResponse.redirect(new URL(`/${locale}`, request.url));
     const raw = request.cookies.get(GUEST_COOKIE)?.value;
-    if (!raw || !verifyGuestToken(raw))
+    if (!raw || !(await verifyGuestToken(raw)))
       return NextResponse.redirect(new URL(`/${locale}`, request.url));
     return intlMiddleware(request) as NextResponse;
   }
@@ -59,7 +59,7 @@ export default function proxy(request: NextRequest): NextResponse {
   // ── 5. Guest routes — explicit allowlist ─────────────────────────────────
   if (isKnownLocale && sub && GUEST_ROUTES.has(sub)) {
     const raw = request.cookies.get(GUEST_COOKIE)?.value;
-    if (!raw || !verifyGuestToken(raw))
+    if (!raw || !(await verifyGuestToken(raw)))
       return NextResponse.redirect(new URL(`/${locale}`, request.url));
     return intlMiddleware(request) as NextResponse;
   }

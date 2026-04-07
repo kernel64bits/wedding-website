@@ -12,14 +12,18 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
+  const { groupLabel, allowPlusOne, tableNumber } = body;
+  if (typeof groupLabel !== "string" || groupLabel.trim().length === 0)
+    return Response.json({ error: "groupLabel must be a non-empty string" }, { status: 400 });
+  if (typeof allowPlusOne !== "boolean")
+    return Response.json({ error: "allowPlusOne must be a boolean" }, { status: 400 });
+  if (tableNumber !== null && (typeof tableNumber !== "number" || !Number.isInteger(tableNumber)))
+    return Response.json({ error: "tableNumber must be an integer or null" }, { status: 400 });
+
   try {
     const updated = await prisma.invitation.update({
       where: { id },
-      data: {
-        groupLabel: body.groupLabel,
-        allowPlusOne: body.allowPlusOne,
-        tableNumber: body.tableNumber,
-      },
+      data: { groupLabel: groupLabel.trim(), allowPlusOne, tableNumber },
       include: { attendees: { orderBy: { isPrimary: "desc" } } },
     });
     return Response.json(updated);
