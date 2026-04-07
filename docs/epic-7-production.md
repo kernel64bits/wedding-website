@@ -180,6 +180,20 @@ Run through these before go-live:
 
 ---
 
+**7.1.k — Handle stale session cookies (deleted invitations)**
+
+**Description:** If an invitation is deleted while the guest still has a valid session cookie, the HMAC signature passes but the `invitationId` no longer exists in the database. This causes the gate page to redirect to `/fr/home` (session looks valid), but dashboard pages may crash or show empty data.
+
+**Fix:** In the dashboard layout (`app/[locale]/(dashboard)/layout.tsx`), verify the invitation still exists in the DB. If not, clear the cookie and redirect to the gate page. This is a defensive check — in normal usage invitations aren't deleted, but it prevents confusing behavior if one is removed while a guest is logged in.
+
+**Acceptance criteria:**
+- [ ] Dashboard layout checks that `session.invitationId` exists in DB
+- [ ] If invitation is missing: clear `wedding_session` cookie, redirect to gate
+- [ ] Verified by: login, delete invitation via admin/CLI, refresh dashboard → lands on gate page
+- [ ] Post-ticket check: code quality reviewed
+
+---
+
 **7.1.j — Security audit report**
 
 **Description:** Generate a comprehensive report of all implemented security features, controls, and configurations across the application. The goal is to have a single document the project owner can review to verify the site meets security standards.

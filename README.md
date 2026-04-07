@@ -78,6 +78,8 @@ docker compose exec app node scripts/seed-photos.mjs
 ```
 Seeds are idempotent — re-running them overwrites existing data. Never run `seed.mjs` in production (it creates a test token).
 
+> **Tip:** Use `docker compose exec app node scripts/dev.mjs reset` to wipe everything and reseed in one step. See [Dev CLI](#dev-cli) below.
+
 **Log in as a guest**
 ```
 http://localhost:3000/api/login?token=<token>
@@ -86,6 +88,46 @@ Validates the token, sets the session cookie, and redirects to `/invitation` (fi
 
 **Log in as admin**
 Navigate to http://localhost:3000/admin/login. Default credentials after seeding: `admin` / `admin1234`.
+
+---
+
+## Dev CLI
+
+A single script for common operations during manual testing. All commands run inside Docker.
+
+```bash
+docker compose exec app node scripts/dev.mjs <command>
+```
+
+| Command | Description |
+|---------|-------------|
+| `help` | List all available commands |
+| `reset` | Wipe DB + MinIO, reseed everything (admin, guests, photos), print all login URLs and credentials |
+| `guest:create --name "Alice Dupont"` | Create an invitation + primary attendee, print login URL |
+| `guest:list` | List all invitations with token, RSVP status, and login URL |
+| `guest:delete --token <token>` | Delete an invitation and its attendees |
+| `photos:seed` | Download and upload sample photos to MinIO |
+| `photos:clear` | Remove all photos from the MinIO bucket |
+| `settings:lock-rsvp` | Toggle RSVP lock on/off, print new state |
+| `admin:reset-password --password <pw>` | Reset the admin account password |
+
+### Examples
+
+```bash
+# Full reset — start fresh with realistic test data
+docker compose exec app node scripts/dev.mjs reset
+
+# Create a new guest and get their login URL
+docker compose exec app node scripts/dev.mjs guest:create --name "Marie Dupont"
+
+# See all guests with their login URLs
+docker compose exec app node scripts/dev.mjs guest:list
+
+# Lock RSVP submissions to test the locked state
+docker compose exec app node scripts/dev.mjs settings:lock-rsvp
+```
+
+The `reset` command prints a full summary with admin credentials and all guest login URLs — ready to click.
 
 ---
 
@@ -99,16 +141,16 @@ app/                  # Next.js App Router pages and layouts
 components/
   ui/                 #   shadcn/ui components (committed source files)
   admin/              #   Admin-specific components (guest list, etc.)
-  gallery/            #   Photo gallery components (planned)
+  gallery/            #   Photo gallery grid + lightbox
   invitation/         #   Cinematic invitation page components
 lib/                  # Shared utilities
   prisma.ts           #   Prisma client singleton + getSettings()
   session.ts          #   HMAC session signing/verification (Web Crypto API)
-  storage.ts          #   S3 client singleton + listPhotos() + getDownloadUrl()
+  storage.ts          #   S3 client singleton + listPhotos() + getPhotoStream()
   utils.ts            #   cn() helper (clsx + tailwind-merge)
-middleware.ts         # Route protection (allowlist + default deny)
+proxy.ts              # Route protection (allowlist + default deny)
 prisma/               # Database schema and seed scripts
-scripts/              # Utility scripts (photo seeding)
+scripts/              # Utility scripts (dev CLI, photo seeding)
 messages/             # i18n translation files (fr.json, en.json)
 docs/                 # Epic specs and ticket tracking
 ```
@@ -121,7 +163,7 @@ docs/                 # Epic specs and ticket tracking
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| `next` | 16 | Framework — App Router, server components, image optimisation, middleware |
+| `next` | 16 | Framework — App Router, server components, image optimisation, proxy routing |
 | `react` / `react-dom` | 19 | UI rendering |
 | `next-intl` | 4 | Internationalisation — bilingual routing (`/fr`, `/en`), translation files |
 | `tailwindcss` | 4 | Utility-first CSS — all layout, spacing, colour, and responsive design |
@@ -158,7 +200,7 @@ These are **copied source files**, not npm packages. They depend only on `radix-
 | `input.tsx` | Form inputs in the admin sheet and RSVP form |
 | `sheet.tsx` | Slide-in panel for guest detail / create invitation in admin |
 | `table.tsx` | Guest list table in the admin dashboard |
-| `dialog.tsx` | *(planned — T4.5)* Full-screen lightbox for the photo gallery |
+| `dialog.tsx` | Confirmation dialogs (delete invitation, etc.) |
 
 ### Infrastructure
 
@@ -200,9 +242,7 @@ cp .env.example .env
 # Edit .env: set SESSION_SECRET (openssl rand -hex 32)
 docker compose up --build -d
 docker compose exec app npx prisma db push
-docker compose exec app node prisma/seed.mjs
-docker compose exec app node prisma/seed-guests.mjs
-docker compose exec app node scripts/seed-photos.mjs
+docker compose exec app node scripts/dev.mjs reset
 ```
 
-The database and MinIO volume start empty on a fresh clone. Seeds populate both.
+The database and MinIO volume start empty on a fresh clone. The `reset` command seeds the admin account, test guests, and sample photos in one step.

@@ -110,7 +110,7 @@ async function cmdGuestCreate() {
     process.exit(1);
   }
   const token = randomBytes(16).toString("hex");
-  const invitation = await prisma.invitation.create({
+  await prisma.invitation.create({
     data: {
       token,
       groupLabel: name,
@@ -123,7 +123,6 @@ async function cmdGuestCreate() {
   console.log(`  Name:  ${name}`);
   console.log(`  Token: ${token}`);
   console.log(`  Login: ${baseUrl}/api/login?token=${token}`);
-  return invitation;
 }
 
 // ─── guest:list ──────────────────────────────────────────────────────
