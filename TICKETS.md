@@ -36,7 +36,7 @@
 | T7.0.d | Email provider integration | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
 | T7.1 | Harden and ship | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
 | T7.1.j | Security audit report | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
-| T8.0 | Dev CLI for manual testing | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
+| T8.0 | Dev CLI for manual testing | ✅ Done | [epic-8](docs/epic-8-qa.md) |
 | T8.1 | Test infrastructure setup (Vitest) | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
 | T8.2 | Unit tests: session & auth utilities | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
 | T8.3 | API route tests: auth & access control | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |

@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --hostname 0.0.0.0 --turbopack=false",
+    "dev": "next dev --hostname 0.0.0.0 --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "db:seed": "node prisma/seed.mjs",
     "db:seed-guests": "node prisma/seed-guests.mjs",
-    "db:seed-photos": "node scripts/seed-photos.mjs"
+    "db:seed-photos": "node scripts/seed-photos.mjs",
+    "dev:cli": "node scripts/dev.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.750.0",
