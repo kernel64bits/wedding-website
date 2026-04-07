@@ -143,7 +143,7 @@ Run through these before go-live:
 
 | Item | What to do |
 |------|-----------|
-| Missing cascade rules | Add `onDelete: Cascade` on `Attendee → Invitation` relation so deleting an invitation cleans up its attendees. Add `onDelete: SetNull` for `Invitation.tableNumber` → `Table` if/when a foreign key is introduced, so deleting a table doesn't orphan invitations |
+| Missing cascade rules | ✅ `onDelete: Cascade` on `Attendee → Invitation` — done. Add `onDelete: SetNull` for `Invitation.tableNumber` → `Table` if/when a foreign key is introduced, so deleting a table doesn't orphan invitations |
 | Missing database indexes | Add `@@index([email])` on `Invitation` for email lookups (used by request-link). Add `@@index([token])` if Prisma doesn't already optimize the `@unique` constraint for lookups |
 | No `Settings` singleton guard | Ensure the seed script creates the `Settings` singleton row; document that exactly one row must exist |
 

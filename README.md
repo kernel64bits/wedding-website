@@ -72,6 +72,52 @@ messages/         # i18n translation files (fr.json, en.json)
 
 ---
 
+## Dependencies
+
+### Runtime
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `next` | 16 | Framework — App Router, server components, image optimisation, middleware |
+| `react` / `react-dom` | 19 | UI rendering |
+| `next-intl` | 4 | Internationalisation — bilingual routing (`/fr`, `/en`), translation files |
+| `tailwindcss` | 4 | Utility-first CSS — all layout, spacing, colour, and responsive design |
+| `radix-ui` | 1 | Headless accessible UI primitives (Dialog, Sheet, etc.) used by shadcn/ui |
+| `class-variance-authority` | 0.7 | Typed variant helper used internally by shadcn/ui components |
+| `clsx` + `tailwind-merge` | — | Conditional class merging (`cn()` helper in `lib/utils.ts`) |
+| `lucide-react` | 0.475 | Icon set — used throughout the UI (arrows, badges, admin icons, etc.) |
+| `motion` | 12 | Animation library — cinematic invitation page transitions and effects |
+| `@prisma/client` | 7 | Database ORM — type-safe queries against SQLite |
+| `@prisma/adapter-libsql` | 7 | Prisma adapter for libsql (Turso-compatible SQLite driver) |
+| `@libsql/client` | 0.15 | Low-level libsql client used by the Prisma adapter |
+| `bcryptjs` | 3 | Password hashing for admin authentication (pure JS, no native bindings) |
+
+### Dev only
+
+| Package | Purpose |
+|---------|---------|
+| `prisma` | CLI — `prisma db push`, `prisma studio`, schema migrations |
+| `typescript` | Static typing |
+| `@types/*` | TypeScript type definitions for Node, React, bcryptjs |
+| `eslint` + `eslint-config-next` | Linting |
+| `@tailwindcss/postcss` | PostCSS plugin required by Tailwind v4 |
+
+### shadcn/ui components (`components/ui/`)
+
+These are **copied source files**, not npm packages. They depend only on `radix-ui`, `lucide-react`, and `clsx`/`tailwind-merge` — all already listed above.
+
+| Component | Used for |
+|-----------|---------|
+| `button.tsx` | All buttons across guest and admin UI |
+| `badge.tsx` | RSVP status badges in the admin guest list |
+| `card.tsx` | Stat cards on the admin dashboard and guest home |
+| `input.tsx` | Form inputs in the admin sheet and RSVP form |
+| `sheet.tsx` | Slide-in panel for guest detail / create invitation in admin |
+| `table.tsx` | Guest list table in the admin dashboard |
+| `dialog.tsx` | *(planned — T4.5)* Full-screen lightbox for the photo gallery |
+
+---
+
 ## Environment
 
 Copy `.env.example` to `.env` before first run (already done if you cloned the repo):

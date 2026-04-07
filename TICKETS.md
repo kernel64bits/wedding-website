@@ -1,6 +1,6 @@
 # Ticket Status
 
-> Last updated: 2026-03-27
+> Last updated: 2026-03-27 (T4.5 expanded into sub-tickets; onDelete:Cascade done)
 
 | Ticket | Title | Status | Epic file |
 |--------|-------|--------|-----------|
@@ -19,7 +19,9 @@
 | T4.2 | RSVP form | ✅ Done | [epic-4](docs/epic-4-dashboard.md) |
 | T4.3 | Practical info page | ✅ Done | [epic-4](docs/epic-4-dashboard.md) |
 | T4.4 | Seating map | ✅ Done | [epic-4](docs/epic-4-dashboard.md) |
-| T4.5 | Photo gallery | ⬜ Todo | [epic-4](docs/epic-4-dashboard.md) |
+| T4.5.a | Photo gallery — storage abstraction & MinIO local dev | ⬜ Todo | [epic-4](docs/epic-4-dashboard.md) |
+| T4.5.b | Photo gallery — grid page & empty state | ⬜ Todo | [epic-4](docs/epic-4-dashboard.md) |
+| T4.5.c | Photo gallery — lightbox & download (presigned URLs) | ⬜ Todo | [epic-4](docs/epic-4-dashboard.md) |
 | T5.1 | Admin login | ✅ Done | [epic-5](docs/epic-5-admin.md) |
 | T5.2 | Guest list dashboard | ✅ Done | [epic-5](docs/epic-5-admin.md) |
 | T5.3 | Guest detail sheet & create invitation | ✅ Done | [epic-5](docs/epic-5-admin.md) |
