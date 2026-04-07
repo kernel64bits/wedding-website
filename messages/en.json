@@ -117,5 +117,9 @@
       "body": "We cannot wait to celebrate with you.",
       "cta": "Go to my space →"
     }
+  },
+  "gallery": {
+    "title": "Photos",
+    "noPhotos": "No photos yet — check back after the wedding!"
   }
 }

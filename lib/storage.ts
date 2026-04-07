@@ -33,14 +33,14 @@ export interface Photo {
 
 export async function listPhotos(): Promise<Photo[]> {
   const s3 = getS3Client();
-  const command = new ListObjectsV2Command({
-    Bucket: bucket(),
-    Prefix: "thumbnails/",
-  });
-  const response = await s3.send(command);
-  const contents = response.Contents ?? [];
+  const b = bucket();
+  const baseUrl = process.env.S3_PUBLIC_ENDPOINT ?? process.env.S3_ENDPOINT;
 
-  return contents
+  const response = await s3.send(
+    new ListObjectsV2Command({ Bucket: b, Prefix: "thumbnails/" }),
+  );
+
+  return (response.Contents ?? [])
     .filter((obj) => obj.Key && /\.(jpe?g|png|webp)$/i.test(obj.Key))
     .sort((a, b) => (a.Key ?? "").localeCompare(b.Key ?? ""))
     .map((obj) => {
@@ -48,7 +48,7 @@ export async function listPhotos(): Promise<Photo[]> {
       return {
         key: obj.Key!,
         originalKey: `originals/${filename}`,
-        thumbnailUrl: `${process.env.S3_ENDPOINT}/${bucket()}/thumbnails/${filename}`,
+        thumbnailUrl: `${baseUrl}/${b}/thumbnails/${filename}`,
       };
     });
 }

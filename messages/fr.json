@@ -117,5 +117,9 @@
       "body": "Nous avons hâte de célébrer avec vous.",
       "cta": "Accéder à mon espace →"
     }
+  },
+  "gallery": {
+    "title": "Photos",
+    "noPhotos": "Pas encore de photos — revenez après le mariage !"
   }
 }

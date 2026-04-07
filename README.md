@@ -187,8 +187,9 @@ cp .env.example .env
 | `S3_REGION` | `us-east-1` | AWS region |
 | `S3_ACCESS_KEY_ID` | `minioadmin` | S3 access key (MinIO defaults locally) |
 | `S3_SECRET_ACCESS_KEY` | `minioadmin` | S3 secret key |
+| `S3_PUBLIC_ENDPOINT` | *(same as S3_ENDPOINT)* | Browser-facing URL for thumbnails (set in Docker to `http://localhost:9000`) |
 
-> Inside Docker, `S3_ENDPOINT` is overridden to `http://minio:9000` (Docker internal network). The `.env` value (`localhost:9000`) is for running Next.js outside Docker.
+> Inside Docker, `S3_ENDPOINT` is overridden to `http://minio:9000` (Docker internal network) and `S3_PUBLIC_ENDPOINT` to `http://localhost:9000` so thumbnail URLs resolve in the browser.
 
 ---
 
