@@ -29,6 +29,7 @@
   - T7.0.a — App deployment setup (CI/CD, environment variables, domain)
   - T7.0.b — Database migration for production (if switching from SQLite)
   - T7.0.c — Photo storage setup (CDN account, upload workflow, replace Unsplash placeholders)
+    > **Decision for T7.0.c:** Photo downloads currently proxy through Next.js (`getPhotoStream` in `lib/storage.ts`) to avoid Docker hostname issues in dev. In production, consider switching to presigned S3 URLs or CloudFront for direct browser-to-S3 downloads — removes server load from download traffic. Re-add `@aws-sdk/s3-request-presigner` if going that route.
   - T7.0.d — Email provider integration (replace `console.log` stub in `POST /api/request-link`)
 - [ ] Post-ticket check: all decisions documented, implementation tickets created
 

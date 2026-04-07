@@ -3,7 +3,6 @@ import {
   ListObjectsV2Command,
   GetObjectCommand,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 // Singleton S3 client (same pattern as lib/prisma.ts)
 const globalForS3 = globalThis as unknown as { __s3?: S3Client };
@@ -53,11 +52,20 @@ export async function listPhotos(): Promise<Photo[]> {
     });
 }
 
-export async function getDownloadUrl(originalKey: string): Promise<string> {
+export async function getPhotoStream(
+  key: string,
+): Promise<{ body: ReadableStream; contentType: string } | null> {
   const s3 = getS3Client();
-  const command = new GetObjectCommand({
-    Bucket: bucket(),
-    Key: originalKey,
-  });
-  return getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 hour
+  try {
+    const response = await s3.send(
+      new GetObjectCommand({ Bucket: bucket(), Key: key }),
+    );
+    if (!response.Body) return null;
+    return {
+      body: response.Body.transformToWebStream(),
+      contentType: response.ContentType ?? "application/octet-stream",
+    };
+  } catch {
+    return null;
+  }
 }

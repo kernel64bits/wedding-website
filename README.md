@@ -134,8 +134,7 @@ docs/                 # Epic specs and ticket tracking
 | `@prisma/adapter-libsql` | 7 | Prisma adapter for libsql (Turso-compatible SQLite driver) |
 | `@libsql/client` | 0.15 | Low-level libsql client used by the Prisma adapter |
 | `bcryptjs` | 3 | Password hashing for admin authentication (pure JS, no native bindings) |
-| `@aws-sdk/client-s3` | 3 | S3 client — list/get/put objects in MinIO (dev) or AWS S3 (prod) |
-| `@aws-sdk/s3-request-presigner` | 3 | Generate presigned URLs for photo downloads |
+| `@aws-sdk/client-s3` | 3 | S3 client — list/get objects in MinIO (dev) or AWS S3 (prod) |
 
 ### Dev only
 

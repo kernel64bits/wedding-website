@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import type { Photo } from "@/lib/storage";
+import { PhotoLightbox } from "./PhotoLightbox";
 
 interface Props {
   photos: Photo[];
@@ -32,22 +33,13 @@ export function PhotoGrid({ photos }: Props) {
         ))}
       </div>
 
-      {/* Lightbox placeholder — T4.5.c will add prev/next, keyboard nav, download */}
       {selectedIndex !== null && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center cursor-pointer"
-          onClick={() => setSelectedIndex(null)}
-        >
-          <Image
-            src={photos[selectedIndex].thumbnailUrl}
-            alt=""
-            width={900}
-            height={600}
-            unoptimized
-            className="max-h-[85vh] w-auto object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
+        <PhotoLightbox
+          photos={photos}
+          selectedIndex={selectedIndex}
+          onClose={() => setSelectedIndex(null)}
+          onIndexChange={setSelectedIndex}
+        />
       )}
     </>
   );
