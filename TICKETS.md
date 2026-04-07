@@ -1,6 +1,6 @@
 # Ticket Status
 
-> Last updated: 2026-03-27 (T4.5 expanded into sub-tickets; onDelete:Cascade done)
+> Last updated: 2026-04-07 (security audit report added; Datadog observability epic created)
 
 | Ticket | Title | Status | Epic file |
 |--------|-------|--------|-----------|
@@ -35,11 +35,22 @@
 | T7.0.c | Photo storage setup | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
 | T7.0.d | Email provider integration | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
 | T7.1 | Harden and ship | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
+| T7.1.j | Security audit report | ⬜ Todo | [epic-7](docs/epic-7-production.md) |
 | T8.1 | Test infrastructure setup (Vitest + Playwright) | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
 | T8.2 | Unit tests: session & auth utilities | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
 | T8.3 | E2E tests: guest flows | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
 | T8.4 | E2E tests: admin flows | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
 | T8.5 | GitHub Actions CI pipeline | ⬜ Todo | [epic-8](docs/epic-8-qa.md) |
+
+| T10.1 | Datadog agent setup & local dev | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.2 | Application tracing (APM) | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.3 | Structured logging | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.4 | Application metrics (custom) | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.5 | Error tracking | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.6 | Infrastructure agent & host metrics | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.7 | Database monitoring | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.8 | Uptime monitoring & synthetic tests | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
+| T10.9 | Observability dashboard & runbook | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
 
 ## Legend
 | Symbol | Meaning |

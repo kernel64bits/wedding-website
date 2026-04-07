@@ -179,6 +179,34 @@ Run through these before go-live:
 
 ---
 
+**7.1.j — Security audit report**
+
+**Description:** Generate a comprehensive report of all implemented security features, controls, and configurations across the application. The goal is to have a single document the project owner can review to verify the site meets security standards.
+
+**Report should cover:**
+
+| Section | Contents |
+|---------|----------|
+| **Authentication** | Session mechanism (HMAC-SHA256, Web Crypto), cookie flags (HttpOnly, Secure, SameSite), session durations (guest: 30d, admin: 8h), password hashing (bcryptjs, cost 12) |
+| **Authorization** | Middleware route protection (allowlist + default deny), server-side session checks in layouts/API routes, ownership validation in RSVP endpoint |
+| **Input validation** | Which endpoints validate what, max lengths, type checks |
+| **Transport security** | HSTS header, Secure cookie flag, HTTPS enforcement |
+| **Information leakage prevention** | Generic error messages, `poweredByHeader: false`, no stack traces in responses |
+| **Rate limiting** | Per-endpoint limits (from T7.1.c) |
+| **Infrastructure** | Static file protection (.env, dev.db not served), Prisma Studio not exposed, Docker hardening |
+| **Dependencies** | List of all runtime dependencies with purpose and known CVE status |
+| **Known limitations** | No CSRF tokens (mitigated by SameSite), no WAF, in-memory rate limiting (resets on cold start) |
+
+**Deliverable:** `docs/security-report.md` — a living document updated whenever security-relevant changes are made.
+
+**Acceptance criteria:**
+- [ ] Report covers all sections above
+- [ ] Each security control references the relevant file/line
+- [ ] Known limitations are honestly documented
+- [ ] Report reviewed by project owner
+
+---
+
 **Acceptance criteria:**
 - Dev indicator and styles page are gone in production build
 - All security headers present and verified via securityheaders.com
