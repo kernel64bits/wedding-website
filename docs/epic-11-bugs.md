@@ -26,7 +26,7 @@ Bugs and issues identified during code review (2026-04-07). Ordered by severity.
 
 **Fix:** Add a `DELETE` handler in `app/api/admin/invitations/[id]/route.ts` that verifies admin session, cascade-deletes attendees, and removes the invitation.
 
-**Status:** ⬜ Todo
+**Status:** ✅ Done — false positive. Verified that `app/api/admin/invitations/[id]/route.ts:54-69` already exports a `DELETE` handler with admin-session check, `prisma.invitation.delete`, and 204 response. No code change needed.
 
 ---
 
@@ -52,7 +52,7 @@ Bugs and issues identified during code review (2026-04-07). Ordered by severity.
 
 **Fix:** Cache the CryptoKey in a module-level variable or on `globalThis`, similar to the existing singleton patterns.
 
-**Status:** ⬜ Todo
+**Status:** ✅ Done — `getCryptoKey()` now caches the import promise on `globalThis.__sessionKey`, mirroring `lib/prisma.ts` and `lib/storage.ts`. Caching the promise (not the resolved key) avoids a race when concurrent first calls arrive.
 
 ---
 
@@ -65,20 +65,20 @@ Bugs and issues identified during code review (2026-04-07). Ordered by severity.
 
 **Fix:** Add `selectedInv?.tableNumber` to the dependency array, or compute `editTableNumber` as a derived value instead of syncing via effect.
 
-**Status:** ⬜ Todo
+**Status:** ✅ Done — extracted the edit and create panels into separate components keyed on `selectedInv.id` / `"new"`. The "remount on key change" pattern means `useState` initializers re-read fresh props after `router.refresh()` brings new server data, eliminating the stale-form bug. The `useEffect` and `eslint-disable-next-line react-hooks/exhaustive-deps` are gone.
 
 ---
 
 #### T11.6 — Dockerfile runs dev server instead of production build
 
-**Severity:** Medium — deployment
+**Severity:** Medium — deployment *(deferred — not currently required)*
 **File:** `Dockerfile`
 
 **Problem:** The Dockerfile `CMD` runs `npm run dev`, which starts Next.js in development mode with hot reload, source maps, and no optimizations. Any production deployment using this Dockerfile will be slow and expose dev tooling.
 
 **Fix:** Add a multi-stage build: `npm run build` in the build stage, `npm start` in the runtime stage. Keep `docker-compose.yml` overriding to `npm run dev` for local development.
 
-**Status:** ⬜ Todo
+**Status:** ⏸ Deferred — not required for current deployment plan. The site targets Vercel, which builds Next.js natively from the repo and never invokes this `Dockerfile`. The dev `CMD` only matters if a non-Vercel target is added later (self-host, Fly.io, Railway, image-based CI). Reopen this ticket if/when that happens. The `.dockerignore` hardening from T11.11 already prevents secrets/local DB from leaking into any image built locally for testing.
 
 ---
 
@@ -91,7 +91,7 @@ Bugs and issues identified during code review (2026-04-07). Ordered by severity.
 
 **Fix:** Either paginate using `ContinuationToken` or set an explicit `MaxKeys` with a comment documenting the limit.
 
-**Status:** ⬜ Todo
+**Status:** ✅ Done — `listPhotos` now loops with `ContinuationToken` until `IsTruncated` is false, accumulating across all pages before filter/sort/map. Same pattern as `scripts/dev.mjs:249-266`.
 
 ---
 
@@ -104,7 +104,7 @@ Bugs and issues identified during code review (2026-04-07). Ordered by severity.
 
 **Fix:** Catch `NoSuchKey` specifically for 404. Let other errors propagate so they surface as 500s with meaningful logs.
 
-**Status:** ⬜ Todo
+**Status:** ✅ Done — `getPhotoStream` now returns `null` only for `err.name === "NoSuchKey"`; other errors propagate. The download route (`app/api/photos/download/route.ts`) catches them, logs with a `[/api/photos/download]` prefix, and returns 500 instead of silent 404.
 
 ---
 
@@ -117,7 +117,7 @@ Bugs and issues identified during code review (2026-04-07). Ordered by severity.
 
 **Fix:** Hash both inputs before comparing, or pad to equal length. Low priority given the fixed-length output.
 
-**Status:** ⬜ Todo
+**Status:** ✅ Done — `hmacVerify` now rejects any signature whose length is not exactly `EXPECTED_SIG_HEX_LEN` (64) up-front, before `timingSafeCompare` is reached. The compare therefore only ever sees equal-length hex strings; the (already theoretical) length-leak path is unreachable in practice.
 
 ---
 

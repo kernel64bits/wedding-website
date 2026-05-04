@@ -30,14 +30,28 @@ function secret(): string {
 
 const encoder = new TextEncoder();
 
-async function getCryptoKey(): Promise<CryptoKey> {
-  return crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret()),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
+// HMAC-SHA256 → 32 bytes → 64 hex chars. Used to constant-time-validate
+// signature length up-front in hmacVerify (T11.9).
+const EXPECTED_SIG_HEX_LEN = 64;
+
+// Singleton CryptoKey — same pattern as lib/prisma.ts and lib/storage.ts.
+// Cache the import promise (not the resolved key) so concurrent first calls
+// share one importKey() instead of racing.
+const globalForKey = globalThis as unknown as {
+  __sessionKey?: Promise<CryptoKey>;
+};
+
+function getCryptoKey(): Promise<CryptoKey> {
+  if (!globalForKey.__sessionKey) {
+    globalForKey.__sessionKey = crypto.subtle.importKey(
+      "raw",
+      encoder.encode(secret()),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
+  }
+  return globalForKey.__sessionKey;
 }
 
 function hexFromBuffer(buf: ArrayBuffer): string {
@@ -73,6 +87,10 @@ async function hmacVerify<T extends { expiresAt: number }>(
 
   const b64 = token.slice(0, dot);
   const sig = token.slice(dot + 1);
+
+  // Reject anything that doesn't have the expected signature length up-front,
+  // so timingSafeCompare below only ever sees equal-length hex strings (T11.9).
+  if (sig.length !== EXPECTED_SIG_HEX_LEN) return null;
 
   try {
     const key = await getCryptoKey();

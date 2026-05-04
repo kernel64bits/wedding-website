@@ -55,14 +55,14 @@
 | T10.9 | Observability dashboard & runbook | ⬜ Todo | [epic-10](docs/epic-10-observability.md) |
 
 | T11.1 | Login route hardcodes `/fr` locale | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
-| T11.2 | Missing DELETE route for admin invitations | ⬜ Todo | [epic-11](docs/epic-11-bugs.md) |
+| T11.2 | Missing DELETE route for admin invitations | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
 | T11.3 | RSVP form allows submission with null attending | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
-| T11.4 | CryptoKey re-imported on every session op | ⬜ Todo | [epic-11](docs/epic-11-bugs.md) |
-| T11.5 | Admin guest list stale data after refresh | ⬜ Todo | [epic-11](docs/epic-11-bugs.md) |
-| T11.6 | Dockerfile runs dev server in production | ⬜ Todo | [epic-11](docs/epic-11-bugs.md) |
-| T11.7 | Photo listing unbounded (max 1000) | ⬜ Todo | [epic-11](docs/epic-11-bugs.md) |
-| T11.8 | S3 errors swallowed as "not found" | ⬜ Todo | [epic-11](docs/epic-11-bugs.md) |
-| T11.9 | timingSafeCompare leaks signature length | ⬜ Todo | [epic-11](docs/epic-11-bugs.md) |
+| T11.4 | CryptoKey re-imported on every session op | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
+| T11.5 | Admin guest list stale data after refresh | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
+| T11.6 | Dockerfile runs dev server in production | ⏸ Deferred | [epic-11](docs/epic-11-bugs.md) |
+| T11.7 | Photo listing unbounded (max 1000) | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
+| T11.8 | S3 errors swallowed as "not found" | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
+| T11.9 | timingSafeCompare leaks signature length | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
 | T11.10 | Empty `package-lock.json` | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
 | T11.11 | `.dockerignore` doesn't exclude secrets/local DB | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
 | T11.12 | Admin invitations PATCH rejects partial updates | ✅ Done | [epic-11](docs/epic-11-bugs.md) |
@@ -72,6 +72,7 @@
 | Symbol | Meaning |
 |--------|---------|
 | ✅ Done | Implemented, committed, post-ticket checks passed |
+| ⏸ Deferred | Not required right now; reopen if conditions change |
 | 🔜 Next | Planned next ticket |
 | ⬜ Todo | Not started |
 | ⬜ Optional | Low priority / skippable |

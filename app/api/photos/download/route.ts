@@ -15,7 +15,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid key" }, { status: 400 });
   }
 
-  const result = await getPhotoStream(key);
+  let result: Awaited<ReturnType<typeof getPhotoStream>>;
+  try {
+    result = await getPhotoStream(key);
+  } catch (err) {
+    console.error("[/api/photos/download] S3 error:", err);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  }
   if (!result) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

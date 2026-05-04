@@ -35,11 +35,22 @@ export async function listPhotos(): Promise<Photo[]> {
   const b = bucket();
   const baseUrl = process.env.S3_PUBLIC_ENDPOINT ?? process.env.S3_ENDPOINT;
 
-  const response = await s3.send(
-    new ListObjectsV2Command({ Bucket: b, Prefix: "thumbnails/" }),
-  );
+  // Paginate through all objects — ListObjectsV2 caps a single page at 1000.
+  const all: { Key?: string }[] = [];
+  let token: string | undefined;
+  do {
+    const response = await s3.send(
+      new ListObjectsV2Command({
+        Bucket: b,
+        Prefix: "thumbnails/",
+        ContinuationToken: token,
+      }),
+    );
+    if (response.Contents) all.push(...response.Contents);
+    token = response.IsTruncated ? response.NextContinuationToken : undefined;
+  } while (token);
 
-  return (response.Contents ?? [])
+  return all
     .filter((obj) => obj.Key && /\.(jpe?g|png|webp)$/i.test(obj.Key))
     .sort((a, b) => (a.Key ?? "").localeCompare(b.Key ?? ""))
     .map((obj) => {
@@ -65,7 +76,10 @@ export async function getPhotoStream(
       body: response.Body.transformToWebStream(),
       contentType: response.ContentType ?? "application/octet-stream",
     };
-  } catch {
-    return null;
+  } catch (err) {
+    // Only swallow real "not found" errors. Connection / permission / config
+    // errors propagate so callers can log them and return 500 instead of 404.
+    if (err instanceof Error && err.name === "NoSuchKey") return null;
+    throw err;
   }
 }
