@@ -40,6 +40,7 @@
     "successTitle": "RSVP enregistré",
     "successBody": "Merci pour votre réponse, à très bientôt\u00a0!",
     "nameRequired": "Le nom est requis",
+    "answerRequired": "Merci d'indiquer la présence de chaque invité avant d'envoyer.",
     "locked": "Les réponses sont maintenant fermées. Merci d'avoir répondu\u00a0!",
     "error": "Une erreur est survenue, veuillez réessayer."
   },

@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { THEME } from "@/lib/theme.config";
+import "@/app/globals.css";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],

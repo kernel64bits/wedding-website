@@ -49,6 +49,9 @@ export async function POST(request: NextRequest) {
     if (typeof plusOne.name !== "string" || plusOne.name.trim() === "") {
       return NextResponse.json({ error: "plusOne.name is required" }, { status: 400 });
     }
+    if (typeof plusOne.attending !== "boolean") {
+      return NextResponse.json({ error: "plusOne.attending must be boolean" }, { status: 400 });
+    }
     if (plusOne.dietaryRestrictions?.length > 500) {
       return NextResponse.json({ error: "dietaryRestrictions too long" }, { status: 400 });
     }

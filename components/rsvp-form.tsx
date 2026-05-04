@@ -232,6 +232,12 @@ export function RsvpForm({ invitation, rsvpLocked }: Props) {
     );
   }
 
+  // Every pre-registered attendee must have an explicit attending answer.
+  // The plus-one (if enabled) must also have one.
+  const allAnswered =
+    preRegistered.every((a) => states[a.id].attending !== null) &&
+    (!plusOne.enabled || plusOne.state.attending !== null);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -239,19 +245,20 @@ export function RsvpForm({ invitation, rsvpLocked }: Props) {
       setNameError(true);
       return;
     }
+    if (!allAnswered) return;
     setNameError(false);
     setStatus("submitting");
 
     const body = {
       attendees: preRegistered.map((a) => ({
         id: a.id,
-        attending: states[a.id].attending ?? false,
+        attending: states[a.id].attending,
         dietaryRestrictions: serializeDietary(states[a.id].dietary, states[a.id].otherDietary),
       })),
       plusOne: plusOne.enabled
         ? {
             name: plusOne.name.trim(),
-            attending: plusOne.state.attending ?? true,
+            attending: plusOne.state.attending,
             dietaryRestrictions: serializeDietary(plusOne.state.dietary, plusOne.state.otherDietary),
           }
         : null,
@@ -335,8 +342,15 @@ export function RsvpForm({ invitation, rsvpLocked }: Props) {
       {status === "error" && (
         <p className="text-sm text-destructive">{t("error")}</p>
       )}
+      {!allAnswered && (
+        <p className="text-sm text-muted-foreground">{t("answerRequired")}</p>
+      )}
 
-      <Button type="submit" disabled={status === "submitting"} className="w-full sm:w-auto">
+      <Button
+        type="submit"
+        disabled={status === "submitting" || !allAnswered}
+        className="w-full sm:w-auto"
+      >
         {t("submit")}
       </Button>
     </form>

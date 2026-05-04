@@ -12,18 +12,37 @@ export async function PATCH(
   const { id } = await params;
   const body = await request.json();
 
+  // PATCH semantics — only validate and update fields that are present.
   const { groupLabel, allowPlusOne, tableNumber } = body;
-  if (typeof groupLabel !== "string" || groupLabel.trim().length === 0)
-    return Response.json({ error: "groupLabel must be a non-empty string" }, { status: 400 });
-  if (typeof allowPlusOne !== "boolean")
-    return Response.json({ error: "allowPlusOne must be a boolean" }, { status: 400 });
-  if (tableNumber !== null && (typeof tableNumber !== "number" || !Number.isInteger(tableNumber)))
-    return Response.json({ error: "tableNumber must be an integer or null" }, { status: 400 });
+  const data: {
+    groupLabel?: string;
+    allowPlusOne?: boolean;
+    tableNumber?: number | null;
+  } = {};
+
+  if (groupLabel !== undefined) {
+    if (typeof groupLabel !== "string" || groupLabel.trim().length === 0)
+      return Response.json({ error: "groupLabel must be a non-empty string" }, { status: 400 });
+    data.groupLabel = groupLabel.trim();
+  }
+  if (allowPlusOne !== undefined) {
+    if (typeof allowPlusOne !== "boolean")
+      return Response.json({ error: "allowPlusOne must be a boolean" }, { status: 400 });
+    data.allowPlusOne = allowPlusOne;
+  }
+  if (tableNumber !== undefined) {
+    if (tableNumber !== null && (typeof tableNumber !== "number" || !Number.isInteger(tableNumber)))
+      return Response.json({ error: "tableNumber must be an integer or null" }, { status: 400 });
+    data.tableNumber = tableNumber;
+  }
+
+  if (Object.keys(data).length === 0)
+    return Response.json({ error: "No fields to update" }, { status: 400 });
 
   try {
     const updated = await prisma.invitation.update({
       where: { id },
-      data: { groupLabel: groupLabel.trim(), allowPlusOne, tableNumber },
+      data,
       include: { attendees: { orderBy: { isPrimary: "desc" } } },
     });
     return Response.json(updated);

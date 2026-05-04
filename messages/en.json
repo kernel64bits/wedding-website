@@ -40,6 +40,7 @@
     "successTitle": "RSVP confirmed",
     "successBody": "Thank you for your response, see you soon!",
     "nameRequired": "Name is required",
+    "answerRequired": "Please answer for every guest before submitting.",
     "locked": "Responses are now closed. Thank you for replying!",
     "error": "Something went wrong, please try again."
   },

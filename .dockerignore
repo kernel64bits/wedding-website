@@ -1,5 +1,37 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (regenerated inside container)
 node_modules
+
+# Build output
 .next
+out
+
+# Local env / secrets — must NEVER be baked into the image
+.env
+.env.local
+.env.*.local
+
+# Local database
+dev.db
+dev.db-journal
 prisma/dev.db
 prisma/dev.db-journal
-.next
+
+# Editor / OS
+.DS_Store
+.vscode
+.idea
+*.swp
+
+# Test / coverage
+coverage
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
+
+# Docker / Claude
+.dockerignore
+.claude
